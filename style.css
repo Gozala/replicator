@@ -1,0 +1,340 @@
+:root {
+  color-scheme: light dark;
+  --font: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue,
+    helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --link-color: #463f5c;
+  --highlighted-text-color: yellow;
+  --line-color: #7a7a7a;
+  --dotted-line-color: #272727;
+  --quoted-text-color: #555;
+  --header-color: #272727;
+  --hr-border: 1px solid lightgray;
+  --table-border-color: #333;
+
+  --side-bar-bg-color: #fafafa;
+  --control-text-color: #777;
+
+  --tooltip-color: #333333;
+  --tooltip-bg: transparent;
+
+  --rawblock-edit-panel-bd: #fafafa;
+
+  --avatar-size: 128px;
+  --mono-fonts: 14px/1.5 Menlo, Consolas, monospace;
+
+  --solarized-base-03: #002b36;
+  --solarized-base-02: #073642;
+  --solarized-base-01: #586e75;
+  --solarized-base-00: #657b83;
+  --solarized-base-0: #839496;
+  --solarized-base-1: #93a1a1;
+  --solarized-base-2: #eee8d5;
+  --solarized-base-3: #fdf6e3;
+  --solarized-solar-yellow: #b58900;
+  --solarized-solar-orange: #cb4b16;
+  --solarized-solar-red: #dc322f;
+  --solarized-solar-magenta: #d33682;
+  --solarized-solar-violet: #6c71c4;
+  --solarized-solar-blue: #268bd2;
+  --solarized-solar-cyan: #2aa198;
+  --solarized-solar-green: #859900;
+
+  --syntax-background: var(--side-bar-bg-color);
+  --gutter-bg-color: var(--solarized-base-2);
+  --gutter-text-color: var(--solarized-base-1);
+  --gutter-marker-color: var(--solarized-solar-orange);
+  --active-line-bg-color: rgba(0, 0, 0, 0.03);
+
+  --syntax-normal: var(--solarized-base-00);
+  --syntax-cursor: var(--solarized-base-02);
+
+  --select-text-bg-color: #d7d4f0;
+
+  --syntax-header: var(--solarized-base-01);
+  --syntax-comment: var(--solarized-base-01);
+  --syntax-invalid: var(--solarized-base-01);
+
+  --syntax-tag: var(--solarized-base-1);
+  --syntax-quote: var(--solarized-base-1);
+  --syntax-link: var(--solarized-base-1);
+
+  --syntax-keyword: var(--solarized-solar-orange);
+  --syntax-bracket: var(--solarized-solar-orange);
+
+  --syntax-matchingbracket: var(--solarized-solar-green);
+  --syntax-string: var(--solarized-solar-green);
+  --syntax-meta: var(--solarized-solar-green);
+
+  --syntax-qualifier: var(--solarized-solar-yellow);
+  --syntax-variable-2: var(--solarized-solar-yellow);
+  --syntax-string-2: var(--solarized-solar-yellow);
+
+  --syntax-atom: var(--solarized-solar-magenta);
+  --syntax-number: var(--solarized-solar-magenta);
+  --syntax-builtin: var(--solarized-solar-magenta);
+
+  --syntax-attribute: var(--solarized-solar-cyan);
+  --syntax-def: var(--solarized-solar-cyan);
+  --syntax-property: var(--solarized-solar-cyan);
+
+  --syntax-variable: var(--solarized-base-0);
+
+  --syntax-operator: var(--solarized-solar-violet);
+  --syntax-type: var(--solarized-solar-violet);
+  --syntax-special: var(--solarized-solar-violet);
+
+  --syntax-nonmatchingbracket: var(--solarized-solar-red);
+  --syntax-squiggle: var(--solarized-solar-red);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #363b40;
+    --side-bar-bg-color: #2e3033;
+    --text-color: #b8bfc6;
+    --link-color: #a9b2d1;
+    --line-color: #474d54;
+    --dotted-line-color: #dedede;
+    --quoted-text-color: #9da2a6;
+
+    --header-color: #dedede;
+    --highlighted-text-color: #bf7a8f;
+    --hr-border: 1px solid #555;
+    --table-border-color: #b7b7b7;
+
+    --select-text-bg-color: #4a89dc;
+
+    --item-hover-bg-color: #0a0d16;
+    --control-text-color: #b7b7b7;
+    --control-text-hover-color: #eee;
+    --window-border: 1px solid #555;
+
+    --active-file-bg-color: rgb(34, 34, 34);
+    --active-file-border-color: #8d8df0;
+
+    --primary-color: #a3d5fe;
+
+    --active-file-text-color: white;
+    --item-hover-bg-color: #70717d;
+    --item-hover-text-color: white;
+
+    --rawblock-edit-panel-bd: #333;
+
+    --search-select-bg-color: #428bca;
+
+    --tooltip-color: #b8bfc6;
+    --tooltip-bg: transparent;
+
+    --syntax-background: var(--side-bar-bg-color);
+    --gutter-background: var(--solarized-base-02);
+    --gutter-text-color: var(--solarized-base-01);
+    --gutter-marker-color: var(--solarized-solar-yellow);
+    --active-line-bg-color: rgba(255, 255, 255, 0.03);
+
+    --syntax-normal: var(--solarized-base-0);
+    --syntax-cursor: var(--solarized-base-2);
+
+    --select-text-bg-color: #3a505f;
+  }
+}
+
+:root {
+  color-scheme: light dark;
+  --font: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue,
+    helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --link-color: #463f5c;
+  --highlighted-text-color: yellow;
+  --line-color: #7a7a7a;
+  --dotted-line-color: #272727;
+  --quoted-text-color: #555;
+  --header-color: #272727;
+  --hr-border: 1px solid lightgray;
+  --table-border-color: #333;
+
+  --side-bar-bg-color: #fafafa;
+  --control-text-color: #777;
+
+  --tooltip-color: #333333;
+  --tooltip-bg: transparent;
+
+  --rawblock-edit-panel-bd: #fafafa;
+
+  --avatar-size: 128px;
+  --mono-fonts: 14px/1.5 Menlo, Consolas, monospace;
+
+  --solarized-base-03: #002b36;
+  --solarized-base-02: #073642;
+  --solarized-base-01: #586e75;
+  --solarized-base-00: #657b83;
+  --solarized-base-0: #839496;
+  --solarized-base-1: #93a1a1;
+  --solarized-base-2: #eee8d5;
+  --solarized-base-3: #fdf6e3;
+  --solarized-solar-yellow: #b58900;
+  --solarized-solar-orange: #cb4b16;
+  --solarized-solar-red: #dc322f;
+  --solarized-solar-magenta: #d33682;
+  --solarized-solar-violet: #6c71c4;
+  --solarized-solar-blue: #268bd2;
+  --solarized-solar-cyan: #2aa198;
+  --solarized-solar-green: #859900;
+
+  --syntax-background: var(--side-bar-bg-color);
+  --gutter-bg-color: var(--solarized-base-2);
+  --gutter-text-color: var(--solarized-base-1);
+  --gutter-marker-color: var(--solarized-solar-orange);
+  --active-line-bg-color: rgba(0, 0, 0, 0.03);
+
+  --syntax-normal: var(--solarized-base-00);
+  --syntax-cursor: var(--solarized-base-02);
+
+  --select-text-bg-color: #d7d4f0;
+
+  --syntax-header: var(--solarized-base-01);
+  --syntax-comment: var(--solarized-base-01);
+  --syntax-invalid: var(--solarized-base-01);
+
+  --syntax-tag: var(--solarized-base-1);
+  --syntax-quote: var(--solarized-base-1);
+  --syntax-link: var(--solarized-base-1);
+
+  --syntax-keyword: var(--solarized-solar-orange);
+  --syntax-bracket: var(--solarized-solar-orange);
+
+  --syntax-matchingbracket: var(--solarized-solar-green);
+  --syntax-string: var(--solarized-solar-green);
+  --syntax-meta: var(--solarized-solar-green);
+
+  --syntax-qualifier: var(--solarized-solar-yellow);
+  --syntax-variable-2: var(--solarized-solar-yellow);
+  --syntax-string-2: var(--solarized-solar-yellow);
+
+  --syntax-atom: var(--solarized-solar-magenta);
+  --syntax-number: var(--solarized-solar-magenta);
+  --syntax-builtin: var(--solarized-solar-magenta);
+
+  --syntax-attribute: var(--solarized-solar-cyan);
+  --syntax-def: var(--solarized-solar-cyan);
+  --syntax-property: var(--solarized-solar-cyan);
+
+  --syntax-variable: var(--solarized-base-0);
+
+  --syntax-operator: var(--solarized-solar-violet);
+  --syntax-type: var(--solarized-solar-violet);
+  --syntax-special: var(--solarized-solar-violet);
+
+  --syntax-nonmatchingbracket: var(--solarized-solar-red);
+  --syntax-squiggle: var(--solarized-solar-red);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #363b40;
+    --side-bar-bg-color: #2e3033;
+    --text-color: #b8bfc6;
+    --link-color: #a9b2d1;
+    --line-color: #474d54;
+    --dotted-line-color: #dedede;
+    --quoted-text-color: #9da2a6;
+
+    --header-color: #dedede;
+    --highlighted-text-color: #bf7a8f;
+    --hr-border: 1px solid #555;
+    --table-border-color: #b7b7b7;
+
+    --select-text-bg-color: #4a89dc;
+
+    --item-hover-bg-color: #0a0d16;
+    --control-text-color: #b7b7b7;
+    --control-text-hover-color: #eee;
+    --window-border: 1px solid #555;
+
+    --active-file-bg-color: rgb(34, 34, 34);
+    --active-file-border-color: #8d8df0;
+
+    --primary-color: #a3d5fe;
+
+    --active-file-text-color: white;
+    --item-hover-bg-color: #70717d;
+    --item-hover-text-color: white;
+
+    --rawblock-edit-panel-bd: #333;
+
+    --search-select-bg-color: #428bca;
+
+    --tooltip-color: #b8bfc6;
+    --tooltip-bg: transparent;
+
+    --syntax-background: var(--side-bar-bg-color);
+    --gutter-background: var(--solarized-base-02);
+    --gutter-text-color: var(--solarized-base-01);
+    --gutter-marker-color: var(--solarized-solar-yellow);
+    --active-line-bg-color: rgba(255, 255, 255, 0.03);
+
+    --syntax-normal: var(--solarized-base-0);
+    --syntax-cursor: var(--solarized-base-2);
+
+    --select-text-bg-color: #3a505f;
+  }
+}
+
+html,
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+    helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  font-family: var(--font);
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5rem;
+  font-weight: 400;
+  fill: currentColor;
+}
+
+body {
+  font-size: 1.5rem;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font);
+}
+
+hr {
+  height: 2px;
+  border: 0;
+  margin: 24px 0 !important;
+  border-bottom: var(--hr-border);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font);
+  font-weight: normal;
+  clear: both;
+  -ms-word-wrap: break-word;
+  word-wrap: break-word;
+  margin: 0;
+  padding: 0;
+  color: var(--header-color);
+}
