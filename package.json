@@ -1,0 +1,32 @@
+{
+  "name": "@gozala/replicator",
+  "version": "0.0.0",
+  "description": "Experimental collborative runtime",
+  "repository": "https://github.com/gozala/replicator",
+  "author": "Irakli Gozalishvili <contact@gozala.io>",
+  "license": "MIT",
+  "scripts": {
+    "prepare": "npm run install:ipfs && npm run install:notebook-inspector && npm run install:reflex",
+    "install:ipfs": "esbuild node_modules/ipfs-core --bundle --format=esm --sourcemap --main-fields=browser,module,main --inject:./src/node-globals.js --define:process.env.NODE_ENV='\"production\"' --splitting --outdir=./replicator/modules/ipfs-core",
+    "install:notebook-inspector": "esbuild node_modules/@observablehq/notebook-inspector/src/* --outdir=./replicator/modules/notebook-inspector",
+    "install:reflex": "mkdir -p ./replicator/modules/reflex/src/ && cp node_modules/reflex/src/* ./replicator/modules/reflex/src/"
+  },
+  "dependencies": {
+    "assert": "2.0.0",
+    "bcrypto": "git://github.com/gozala/bcrypto#patch-1",
+    "globalthis": "git://github.com/gozala/globalThis#patch-1",
+    "ipfs-core": "0.5.0",
+    "libp2p-websockets": "git://github.com/libp2p/js-libp2p-websockets#fix/esbuild-compat",
+    "path-browserify": "1.0.1",
+    "process": "0.11.10",
+    "stream-browserify": "3.0.0",
+    "url": "0.11.0",
+    "util": "0.12.3",
+    "@observablehq/notebook-inspector": "git://github.com/gozala/notebook-inspector#master",
+    "reflex": "git://github.com/gozala/reflex#ts"
+  },
+  "devDependencies": {
+    "esbuild": "0.8.39",
+    "typescript": "4.2.0-beta"
+  }
+}

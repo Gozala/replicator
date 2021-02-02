@@ -1,0 +1,69 @@
+.CodeMirror {
+  height: auto;
+}
+
+.cm-s-interactivate.CodeMirror {
+  background: none;
+  color: var(--syntax_normal);
+  font: var(--mono_fonts);
+  height: auto;
+  z-index: 1;
+}
+.cm-s-interactivate.CodeMirror-focused {
+  border-left-color: #000;
+}
+.CodeMirror-lines {
+  padding: 6px 10px;
+}
+.cm-s-interactivate .CodeMirror-selected {
+  background: none;
+}
+.cm-s-interactivate.CodeMirror-focused .CodeMirror-selected {
+  background: var(--selection);
+}
+.cm-s-interactivate .CodeMirror-line::selection,
+.cm-s-interactivate .CodeMirror-line > span::selection,
+.cm-s-interactivate .CodeMirror-line > span > span::selection {
+  background: var(--selection);
+}
+.cm-s-interactivate .CodeMirror-line::-moz-selection,
+.cm-s-interactivate .CodeMirror-line > span::-moz-selection,
+.cm-s-interactivate .CodeMirror-line > span > span::-moz-selection {
+  background: var(--selection);
+}
+.cm-s-interactivate.CodeMirror .CodeMirror-matchingbracket {
+  border-bottom: 1px solid var(--syntax_matchbracket);
+  color: var(--syntax_normal);
+}
+.cm-s-interactivate .CodeMirror-cursor {
+  border-left: 1px solid #505050;
+}
+.dark .cm-s-interactivate .CodeMirror-cursor {
+  border-left: 1px solid #f4f4f4;
+}
+span.cm-comment {
+  color: var(--syntax_comment);
+}
+span.cm-number,
+span.cm-regexp {
+  color: var(--syntax_number);
+}
+span.cm-keyword {
+  color: var(--syntax_keyword);
+}
+span.cm-atom {
+  color: var(--syntax_atom);
+}
+span.cm-string,
+span.cm-string-2 {
+  color: var(--syntax_string);
+}
+span.cm-variable {
+  color: var(--syntax_unknown_variable);
+}
+span.cm-variable-2 {
+  color: var(--syntax_known_variable);
+}
+span.cm-error {
+  background: var(--syntax_error);
+}

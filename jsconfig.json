@@ -1,0 +1,16 @@
+// This file is used by esbuild to do perform path substitution.
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "stream": ["node_modules/stream-browserify"],
+      "path": ["node_modules/path-browserify"],
+      // Works around https://github.com/libp2p/js-libp2p-websockets/pull/120
+      "libp2p-websockets": ["node_modules/libp2p-websockets"],
+      // Works around https://github.com/bcoin-org/bcrypto/pull/58
+      "bcrypto/*": ["node_modules/bcrypto/*"],
+      // Works around https://github.com/es-shims/globalThis/pull/17
+      "globalthis": ["node_modules/globalthis"]
+    },
+  }
+}
