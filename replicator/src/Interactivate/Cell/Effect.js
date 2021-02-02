@@ -192,10 +192,7 @@ export const setSelection = (id, dir) => () => {
   }
 }
 
-const analyzer = new URL(
-  "/src/Interactivate/Worker/analyzer.bundle.js",
-  location.href
-)
+const analyzer = new URL("../Worker/analyzer.bundle.js", import.meta.url)
 
 /**
  * @param {string} source

@@ -34,7 +34,7 @@ const fetchStyle = async (path) => {
 const style = async () => {
   const [base, theme] = await Promise.all([
     fetchStyle("../../modules/codemirror/lib/codemirror.css"),
-    fetchStyle("../../../theme.css"),
+    fetchStyle("../../theme.css"),
   ])
   return `
   :host {

@@ -23,8 +23,9 @@ export const init = ({ state, url }) => {
   if (state) {
     return [state, nofx]
   } else {
-    const path = url.pathname.substr(1)
-    const notebookURL = path === "" ? null : new URL(`//${path}`, url)
+    // const path = url.pathname.substr(1)
+    // const notebookURL = path === "" ? null : new URL(`//${path}`, url)
+    const notebookURL = null
     const [notebook, fx] = Notebook.open(notebookURL)
     return [Data.init(notebook), fx.map(Inbox.notebook)]
   }
