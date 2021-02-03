@@ -101,7 +101,7 @@ const route = (message, state) => {
 
 export const view = (state /*:Model*/) =>
   doc(
-    "",
+    "Interactive Notebook",
     body(
       [className("sans-serif")],
       [
