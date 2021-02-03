@@ -1,8 +1,8 @@
 // @flow strict
 
-import { on } from "../../modules/reflex/src/VirtualDOM.js"
+import { attribute, on } from "../../modules/reflex/src/VirtualDOM.js"
 import { section, customElement } from "../../modules/reflex/src/Element.js"
-import { className, property, id } from "../../modules/reflex/src/Attribute.js"
+import { className, property, tabIndex, id } from "../../modules/reflex/src/Attribute.js"
 import { unreachable } from "../../modules/reflex/src/Basics.js"
 import { nofx, fx, send, batch } from "../../modules/reflex/src/Effect.js"
 import InspectBlock from "../Element/InspectBlock.js"
@@ -106,6 +106,7 @@ const viewCodeBlock = (input, key) =>
   customElement("code-block", CodeBlock, [
     id(key),
     property("source", input),
+    tabIndex(0),
     on("focus", Decoder.focus),
     on("change", Decoder.change),
     on("escape", Decoder.escape),

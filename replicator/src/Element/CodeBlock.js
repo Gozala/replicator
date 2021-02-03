@@ -31,26 +31,26 @@ const fetchStyle = async (path) => {
   return await styleSheet.text()
 }
 
-const style = async () => {
-  const [base, theme] = await Promise.all([
-    fetchStyle("../../modules/codemirror/lib/codemirror.css"),
-    fetchStyle("../../theme.css"),
-  ])
-  return `
-  :host {
-    outline: none;
-    contain: content;
-  }
+// const style = async () => {
+//   // const [base, theme] = await Promise.all([
+//   //   // fetchStyle("../../modules/codemirror/lib/codemirror.css"),
+//   //   // fetchStyle("../../theme.css"),
+//   // ])
+//   return `
+//   :host {
+//     outline: none;
+//     contain: content;
+//   }
   
-  ${base}
+//   ${base}
 
-  ${theme}
-  `
-}
+//   ${theme}
+//   `
+// }
 
-// We use this hack to avoid layout junk caused by late
-// style application.
-const css = style()
+// // We use this hack to avoid layout junk caused by late
+// // style application.
+// const css = style()
 
 class Options {
   /*::
@@ -122,6 +122,7 @@ export default class CodeBlock extends BaseElement {
     }
 
     this.root = this.attachShadow({ mode: "open", delegatesFocus: true })
+    this.insertStyles()
 
     this.addEventListener("focus", this)
     this.addEventListener("click", this)
@@ -131,21 +132,25 @@ export default class CodeBlock extends BaseElement {
       () => void this.receive("cursorActivity")
     )
   }
-  async connectedCallback() {
-    const style = this.ownerDocument.createElement("style")
-    style.textContent = await css
-    this.root.appendChild(style)
 
+  insertStyles() {
+    // const editorStyle = this.ownerDocument.createElement("link")
+    // editorStyle.setAttribute('rel', 'stylesheet');
+    // editorStyle.setAttribute('href', new URL("../../modules/codemirror/lib/codemirror.css", import.meta.url));
+    
+    const style = this.ownerDocument.createElement("link")
+    style.setAttribute('rel', 'stylesheet');
+    style.setAttribute('href', new URL("./CodeBlock.css", import.meta.url))
+    style.onload = () => this.editor.refresh()
+    
+    this.root.appendChild(style)
+  }
+  async connectedCallback() {
     this.editor = CodeMirror(this.root, this.options)
     this.Pass = CodeMirror.Pass
     this.editor.setOption("extraKeys", this.navigationKeys)
     this.editor.on("changes", this.onChanges)
     this.editor.on("cursorActivity", this.onCursorActivity)
-
-    if (this.ownerDocument.activeElement === this) {
-      this.editor.focus()
-      this.editor.refresh()
-    }
   }
   setSelection(dir /*:-1|1*/) {
     if (this.editor) {
@@ -175,6 +180,7 @@ export default class CodeBlock extends BaseElement {
     if (line === doc.lastLine()) {
       const content = doc.getLine(line)
       if (CELL_PATTERN.test(content)) {
+        this.blur()
         this.send("split")
         return Abort
       }
@@ -217,10 +223,12 @@ export default class CodeBlock extends BaseElement {
       case "focus": {
         if (this.editor) {
           this.editor.refresh()
-          return this.focus()
+          return this.editor.focus()
         }
+        break
       }
       case "blur": {
+        break
       }
     }
   }
@@ -251,8 +259,17 @@ export default class CodeBlock extends BaseElement {
     ) {
       return this.Pass
     } else {
+      this.blur()
       this.send("escape", { unit, dir })
     }
+  }
+  blur() {
+    this.editor.state.focused = false
+    this.editor.refresh()
+    console.log(this.editor.state.focused)
+    // this.root.querySelector('textarea').blur()
+    // this.root.focu()
+    // this.root.activeElement.blur()
   }
   syncValue() {
     const { options, editor } = this

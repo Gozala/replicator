@@ -1,3 +1,11 @@
+@import url('../../modules/codemirror/lib/codemirror.css');
+
+:host {
+  outline: none;
+  contain: content;
+  display: block;
+}
+
 .CodeMirror {
   height: auto;
 }
