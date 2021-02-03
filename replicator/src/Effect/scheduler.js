@@ -64,13 +64,27 @@ class Scheduler {
  */
 
 /**
+ * @typedef {Object} IdleDeadline
+ * @property {boolean} didTimeout
+ * @property {() => DOMHighResTimeStamp} timeRemaining
+ * @param {(idleDeadline: IdleDeadline) => void} callback
+ */
+const requestIdleCallback = (callback) => {
+  const start = Date.now()
+  return top.setTimeout(callback, 1, {
+    didTimeout: false,
+    timeRemaining: () => Math.max(0, 50 - (Date.now() - start)),
+  })
+}
+
+/**
  * @type {Scheduler<unknown, void|{timeout:number}, IdleInfo>}
  */
 export const idle = new Scheduler(
   // @ts-ignore
-  top.requestIdleCallback,
+  top.requestIdleCallback || requestIdleCallback,
   // @ts-ignore
-  top.cancelIdleCallback
+  top.cancelIdleCallback || top.clearTimeout
 )
 
 /** @type {Scheduler<number, undefined|number, void>} */
