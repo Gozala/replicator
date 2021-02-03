@@ -1,6 +1,5 @@
-import { unreachable } from "../../modules/reflex/src/Basics.js"
 import * as Observable from "../../modules/notebook-inspector/index.js"
-import Style from "./InspectBlock.css.js"
+// import Style from "./InspectBlock.css.js"
 
 /**
  * @template T
@@ -34,8 +33,11 @@ export default class InpectBlock extends HTMLElement {
   }
   async connectedCallback() {
     const document = this.ownerDocument
-    const style = document.createElement("style")
-    style.textContent = Style
+    // const style = document.createElement("style")
+    // style.textContent = Style
+    const style = document.createElement('link')
+    style.setAttribute('rel', 'stylesheet');
+    style.setAttribute('href', new URL("./InspectBlock.css", import.meta.url))
 
     const select = document.createElement("select")
     this.select = select
@@ -215,7 +217,11 @@ class ValueInspection extends Observable.Inspector {
     this.node = node
   }
   send(value /*:mixed*/) /*:void*/ {
-    this.fulfilled(value)
+    if (value instanceof Error) {
+      this.rejected(value)
+    } else {
+      this.fulfilled(value)
+    }
   }
   render() /*:Element*/ {
     return this.node
