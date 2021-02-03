@@ -1,121 +1,4 @@
-// @flow strict
-
 import { request } from "../../Effect/worker.js"
-
-class Sandbox {
-  /*::
-  lastID:number
-  resolve:mixed => void
-  reject:mixed => void
-  script:HTMLScriptElement
-  handleEvent:Event => mixed
-  */
-  constructor() {
-    this.lastID = 0
-  }
-
-  /**
-   * @param {string} id
-   * @param {string} code
-   */
-  evaluate(id, code) {
-    const { document } = window
-    const script = document.createElement("script")
-    script.id = id
-    script.setAttribute("defer", "defer")
-    script.type = "module"
-    script.addEventListener("error", this)
-    script.addEventListener("evaluated", this)
-    window.addEventListener("error", this)
-
-    // @ts-ignore
-    window[id] = (value, bindings) =>
-      script.dispatchEvent(
-        new CustomEvent("evaluated", {
-          detail: { value, bindings },
-        })
-      )
-    // const blob = new Blob([code], {
-    //   type: "text/javascript"
-    // })
-    // script.src = URL.createObjectURL(blob)
-    script.textContent = code
-    this.script = script
-
-    document.head.appendChild(script)
-    return new Promise((resolve, reject) => {
-      this.resolve = resolve
-      this.reject = reject
-    })
-  }
-
-  /**
-   * @param {any} value
-   */
-  return(value) {
-    const { resolve } = this
-    if (resolve) {
-      resolve(value)
-    }
-    this.finally()
-  }
-
-  /**
-   * @param {Error} error
-   */
-  throw(error) {
-    const { reject } = this
-    if (reject) {
-      reject(error)
-    }
-    this.finally()
-  }
-  finally() {
-    const { script } = this
-    if (script) {
-      script.removeEventListener("evaluated", this)
-      script.removeEventListener("error", this)
-      window.removeEventListener("error", this)
-      script.remove()
-    }
-    // URL.revokeObjectURL(script.src)
-    // script.src = ""
-    // @ts-ignore
-    delete window[script.id]
-    delete this.script
-    delete this.resolve
-    delete this.reject
-  }
-
-  /**
-   * @param {Event & {error:Error, detail?:unknown}} event
-   * @returns
-   */
-  handleEvent(event) {
-    const { script } = this
-    switch (event.target) {
-      case window: {
-        if (event.type === "error" /*&& event.filename === script.src*/) {
-          return this.throw(event.error)
-        }
-        break
-      }
-      case script: {
-        switch (event.type) {
-          case "error": {
-            return this.throw(event.error)
-          }
-          case "evaluated": {
-            return this.return(event.detail)
-          }
-        }
-        break
-      }
-    }
-  }
-}
-
-const sandbox = new Sandbox()
 
 /**
  * @param {string} name
@@ -148,7 +31,7 @@ let lastEvalindex = 0
  * @returns
  */
 export const evaluate = (url, code) => async () => {
-  const evalID = `ø${++lastEvalindex}${Date.now().toString(32)}`
+  const id = `ø${++lastEvalindex}${Date.now().toString(32)}`
   const index = Math.max(code.lastIndexOf("\n"), 0)
   const expression = code.slice(code.indexOf(":", index) + 1).trim()
   const source = `${code.slice(0, index)}\n`
@@ -167,10 +50,28 @@ export const evaluate = (url, code) => async () => {
     const sourceURL = `\n//# sourceURL=${url}`
     const refs = generateBindings(result.ok)
     const out = expression === "" ? "void 0" : expression
-    const code = `${source};${evalID}(${out},${refs})${sourceURL}`
-    const { bindings, value } = await sandbox.evaluate(evalID, code)
+    const code = `${source}\nexport const ${id}=[${out},${refs}]`
+
+    const module = await importCode(code)
+    const [value, bindings] = module[id]
+
     Object.defineProperties(window, bindings)
     return value
+  }
+}
+
+/**
+ * @param {string} code 
+ */
+const importCode = async (code) => {
+  const blob = new Blob([code], {
+    type: "text/javascript"
+  })
+  const url = URL.createObjectURL(blob)
+  try {
+    return await import(url)
+  } finally {
+    URL.revokeObjectURL(url)
   }
 }
 
@@ -180,7 +81,7 @@ export const evaluate = (url, code) => async () => {
  * @param {string} dir
  * @returns
  */
-export const setSelection = (id, dir) => () => {
+export const setSelection = (id, dir) => async () => {
   const target = document.getElementById(id)
   if (target && target.localName === "code-block") {
     const codeBlock /*:Object*/ = target
