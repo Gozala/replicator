@@ -1,10 +1,10 @@
 /**
- * @typedef {string|number} Key
+ * @typedef {string} Key
  */
 
 /**
  * @template {NonNullable<any>} T
- * @typedef {Record<Key, T>} Dictionary<T>
+ * @typedef {Readonly<Record<Key, T>>} Dictionary<T>
  */
 
 /**
@@ -15,29 +15,55 @@
 function Dict() {}
 Object.setPrototypeOf(Dict.prototype, null)
 
-const seed /*:Dictionary<any>*/ = new Dict()
+/** @type {Dictionary<any>} */
+const seed =
+  // @ts-ignore
+  new Dict()
 
-export const empty = /*::<a>*/ () /*:Dictionary<a>*/ => seed
+/**
+ * @template T
+ * @returns {Dictionary<T>}
+ */
+export const empty = () => seed
 
-const mutable = /*::<a>*/ (source /*:Dictionary<a>*/) /*:Mutable<a>*/ =>
-  Object.assign(new Dict(), source)
+/**
+ * @template T
+ * @param {Dictionary<T>} [source]
+ * @returns {Mutable<T>}
+ */
+const mutable = (source) =>
+  Object.assign(
+    // @ts-ignore
+    new Dict(),
+    source
+  )
 
+/**
+ * @template {NonNullable<any>} T
+ * @param {Key} key
+ * @param {T} value
+ * @returns {Dictionary<T>}
+ */
 export const singleton = /*::<a>*/ (
   key /*:Key*/,
   value /*:a*/
 ) /*:Dictionary<a>*/ => {
-  const data = new Dict()
+  const data = mutable()
   data[key] = value
   return data
 }
 
-export const from = /*::<a>*/ (
-  entries /*:Iterable<[string, a]> | Iterable<[number, a]>*/
-) /*:Dictionary<a>*/ => {
+/**
+ * @template T
+ * @template {Key} K
+ * @param {Iterable<[K, T]>} entries
+ * @returns {Dictionary<T>}
+ */
+export const from = (entries) => {
   let data
   for (const [key, value] of entries) {
     if (value != null) {
-      const dict = data || (data = new Dict())
+      const dict = data || (data = mutable())
       dict[key] = value
     }
   }
@@ -45,11 +71,19 @@ export const from = /*::<a>*/ (
   return data || seed
 }
 
-export const insert = /*::<a>*/ (
-  key /*:Key*/,
-  value /*:a*/,
-  data /*:Dictionary<a>*/
-) /*:Dictionary<a>*/ => {
+/**
+ * Returns dictionaly just like given one execept that given `key` is mapped
+ * to given `value`. If given dictionary contains equal value for the given
+ * `key` same dictionary is returned. It does not matter if given dicetionary
+ * contained different `value` for the given `key`.
+ *
+ * @template T
+ * @param {Key} key
+ * @param {T} value
+ * @param {Dictionary<T>} data
+ * @returns {Dictionary<T>}
+ */
+export const insert = (key, value, data) => {
   const current = data[key]
   if (current === value) {
     return data
@@ -60,10 +94,13 @@ export const insert = /*::<a>*/ (
   }
 }
 
-export const insertBatch = /*::<a>*/ (
-  entries /*:Iterable<[Key, a]>*/,
-  data /*:Dictionary<a>*/
-) /*:Dictionary<a>*/ => {
+/**
+ * @template T
+ * @param {Iterable<[Key, T]>} entries
+ * @param {Dictionary<T>} data
+ * @returns {Dictionary<T>}
+ */
+export const insertAll = (entries, data) => {
   let result = null
   for (const [key, value] of entries) {
     const current = data[key]
@@ -75,22 +112,29 @@ export const insertBatch = /*::<a>*/ (
   return result == null ? data : result
 }
 
-export const map = /*::<a, $b, b:$NonMaybeType<$b>>*/ (
-  f /*:a => b*/,
-  data /*:Dictionary<a>*/
-) /*:Dictionary<b>*/ => {
-  const result = new Dict()
-  for (const key in data) {
-    result[key] = f(data[key])
+/**
+ * @template T
+ * @template {NonNullable<any>} U
+ * @param {(value:T) => U} f
+ * @param {Dictionary<T>} data
+ * @returns {Dictionary<U>}
+ */
+export const map = (f, data) => {
+  const result = mutable()
+  for (const [key, value] of Object.entries(data)) {
+    result[key] = f(value)
   }
   return result
 }
 
-export const replaceWith = /*::<a>*/ (
-  key /*:Key*/,
-  replace /*:?a => ?a*/,
-  data /*:Dictionary<a>*/
-) /*:Dictionary<a>*/ => {
+/**
+ * @template T
+ * @param {Key} key
+ * @param {(value?:T) => T|null|undefined} replace
+ * @param {Dictionary<T>} data
+ * @returns {Dictionary<T>}
+ */
+export const replaceWith = (key, replace, data) => {
   const value = replace(data[key])
   if (value != null) {
     return insert(key, value, data)
@@ -99,17 +143,20 @@ export const replaceWith = /*::<a>*/ (
   }
 }
 
-export const remove = /*::<a>*/ (
-  key /*:Key*/,
-  data /*:Dictionary<a>*/
-) /*:Dictionary<a>*/ => {
+/**
+ * @template T
+ * @param {Key} key
+ * @param {Dictionary<T>} data
+ * @returns {Dictionary<T>}
+ */
+export const remove = /*::<a>*/ (key, data) => {
   if (data[key] != null) {
     const dict = mutable(data)
     delete dict[key]
 
     // If it has more keys than we return new instance, otherwise just return
     // empty
-    for (const key in dict) {
+    for (const _key in dict) {
       return dict
     }
 
@@ -119,10 +166,13 @@ export const remove = /*::<a>*/ (
   }
 }
 
-export const removeBatch = /*::<a>*/ (
-  keys /*:string[] | number[]*/,
-  data /*:Dictionary<a>*/
-) /*:Dictionary<a>*/ => {
+/**
+ * @template T
+ * @param {Key[]} keys
+ * @param {Dictionary<T>} data
+ * @returns {Dictionary<T>}
+ */
+export const removeAll = (keys, data) => {
   let result = null
   for (const key of keys) {
     if (data[key] != null) {
@@ -138,7 +188,7 @@ export const removeBatch = /*::<a>*/ (
   if (result == null) {
     return data
   } else {
-    for (const key in result) {
+    for (const _key in result) {
       return result
     }
 
@@ -146,38 +196,58 @@ export const removeBatch = /*::<a>*/ (
   }
 }
 
-export const isEmpty = /*::<a>*/ (data /*:Dictionary<a>*/) /*:boolean*/ =>
-  data === seed
+/**
+ * @template T
+ * @param {Dictionary<T>} data
+ * @returns {boolean}
+ */
+export const isEmpty = (data) => data === seed
 
-export const hasKey = /*::<a>*/ (
-  key /*:Key*/,
-  data /*:Dictionary<a>*/
-) /*:boolean*/ => key in data
+/**
+ * @template T
+ * @param {Key} key
+ * @param {Dictionary<T>} data
+ * @returns {boolean}
+ */
+export const hasKey = (key, data) => key in data
 
-export const get = /*::<a>*/ (key /*:Key*/, data /*:Dictionary<a>*/) /*:?a*/ =>
-  data[key]
+/**
+ * @template T
+ * @param {Key} key
+ * @param {Dictionary<T>} data
+ * @returns {T|null}
+ */
+export const get = (key, data) => data[key] || null
 
-export const keys = /*::<a>*/ (data /*:Dictionary<a>*/) /*:Key[]*/ =>
-  Object.keys(data)
+/**
+ * @template T
+ * @param {Dictionary<T>} data
+ * @returns {Key[]}
+ */
+export const keys = (data) => Object.keys(data)
 
-export const values = /*::<a>*/ (data /*:Dictionary<a>*/) /*:a[]*/ => {
-  const values /*:any*/ = Object.values(data)
-  return values
-}
+/**
+ * @template T
+ * @param {Dictionary<T>} data
+ * @returns {T[]}
+ */
+export const values = (data) => Object.values(data)
 
-export const entries = /*::<a>*/ (
-  data /*:Dictionary<a>*/
-) /*:Array<[Key, a]>*/ => {
-  const entries /*:any*/ = Object.entries(data)
-  return entries
-}
+/**
+ * @template T
+ * @param {Dictionary<T>} data
+ * @returns {Array<[Key, T]>}
+ */
+export const entries = (data) => Object.entries(data)
 
-export const findKey = /*::<a>*/ (
-  predicate /*:a => boolean*/,
-  data /*:Dictionary<a>*/
-) /*:?Key*/ => {
-  for (const key in data) {
-    const value = data[key]
+/**
+ * @template T
+ * @param {(value:T) => boolean} predicate
+ * @param {Dictionary<T>} data
+ * @returns {null|Key}
+ */
+export const findKey = (predicate, data) => {
+  for (const [key, value] of entries(data)) {
     if (predicate(value)) {
       return key
     }
@@ -185,12 +255,14 @@ export const findKey = /*::<a>*/ (
   return null
 }
 
-export const findEntry = /*::<a>*/ (
-  predicate /*:a => boolean*/,
-  data /*:Dictionary<a>*/
-) /*:?[Key, a]*/ => {
-  for (const key in data) {
-    const value = data[key]
+/**
+ * @template T
+ * @param {(value:T) => boolean} predicate
+ * @param {Dictionary<T>} data
+ * @returns {null|[Key, T]}
+ */
+export const findEntry = (predicate, data) => {
+  for (const [key, value] of entries(data)) {
     if (predicate(value)) {
       return [key, value]
     }

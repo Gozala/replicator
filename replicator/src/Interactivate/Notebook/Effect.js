@@ -1,5 +1,10 @@
-export const load = (url /*:URL*/) => async () => {
-  const content = await Dat.readFile(url)
-  const { isOwner } = await Dat.getInfo(url)
-  return { url, content, isOwner }
-}
+/**
+ * @param {URL} url
+ */
+export const load = (url /*:URL*/) =>
+  /**
+   * @returns {Promise<import('./Notebook').Doc>}
+   */
+  async () => {
+    return { url, content: 'show: "Hello"\n', isOwner: true }
+  }

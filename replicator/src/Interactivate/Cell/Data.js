@@ -1,10 +1,10 @@
+import * as Cell from "./Cell.js"
+
 /**
- * @typedef {{id: string, input: string, output: any}} Model
- *
  * @param {string} id
  * @param {string} input
- * @param {any} [output]
- * @returns {Model}
+ * @param {Cell.Output} [output]
+ * @returns {Cell.Model}
  */
 export const init = (id, input, output = undefined) => ({
   id,
@@ -15,8 +15,8 @@ export const init = (id, input, output = undefined) => ({
 /**
  *
  * @param {string} id
- * @param {Model} state
- * @returns {Model}
+ * @param {Cell.Model} state
+ * @returns {Cell.Model}
  */
 export const updateID = (id, state) => ({
   ...state,
@@ -26,8 +26,8 @@ export const updateID = (id, state) => ({
 /**
  *
  * @param {string} input
- * @param {Model} state
- * @returns {Model}
+ * @param {Cell.Model} state
+ * @returns {Cell.Model}
  */
 export const updateInput = (input, state) => ({
   ...state,
@@ -35,10 +35,9 @@ export const updateInput = (input, state) => ({
 })
 
 /**
- *
- * @param {any} output
- * @param {Model} state
- * @returns {Model}
+ * @param {Cell.Output} output
+ * @param {Cell.Model} state
+ * @returns {Cell.Model}
  */
 export const updateOutput = (output, state) => ({
   ...state,
@@ -46,9 +45,7 @@ export const updateOutput = (output, state) => ({
 })
 
 /**
- *
- * @param {Model} state
- * @returns {string}
+ * @param {Cell.Model} state
  */
 export const input = ({ input }) => input
 

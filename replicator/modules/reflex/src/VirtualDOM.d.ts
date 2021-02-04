@@ -1,71 +1,80 @@
 import { Port } from "./Task"
 export interface Doc<T> {
-  title: string;
-  body: Node<T>;
+  title: string
+  body: Node<T>
 
-  map<U>(f:(inn:T) => U): Doc<U>;
+  map<U>(f: (inn: T) => U): Doc<U>
 }
 
-declare export class Node<T> {
-  settings(): Attribute<T>[];
-  children(): Node<T>[];
-  map<U>(f:(inn:T) => U): Node<U>;
+export declare class Node<T> {
+  settings(): Attribute<T>[]
+  children(): Node<T>[]
+  map<U>(f: (inn: T) => U): Node<U>
 }
-declare export class Attribute<T> {
-  map<U>(f:(inn:T) => U): Attribute<U>;
+export declare class Attribute<T> {
+  map<U>(f: (inn: T) => U): Attribute<U>
 }
-export type KeyedNode<T> = [string, Node<T>]
+export type Keyed<T> = [string, T]
 
-declare export function node<T>(
+export declare function node<
+  A extends Attribute<unknown>,
+  C extends Node<unknown>
+>(localName: string, attributes?: A[], children?: C[]): EventNode<A | C>
+
+type EventSource<T> = Attribute<T> | Node<T>
+
+type EventNode<E extends EventSource<unknown>> = E extends EventSource<infer T>
+  ? Node<T>
+  : never
+export declare function customElement<A extends Attribute<unknown>>(
   localName: string,
-  attributes?: Attribute<T>[],
-  children?: Node<T>[]
-): Node<T>
+  constructor: { new (): HTMLElement },
+  attributes?: A[]
+): EventNode<A>
 
-declare export function customElement<T>(
-  localName: string,
-  constructor: {new():HTMLElement},
-  attributes?: Attribute<T>[]
-): Node<T>
+export declare function keyedNode<
+  A extends Attribute<unknown>,
+  C extends Node<unknown>
+>(localName: string, attributes?: A[], children?: Keyed<C>[]): EventNode<A | C>
 
-declare export function keyedNode<T>(
-  localName: string,
-  attributes?: Attribute<T>[],
-  children?: KeyedNode<T>[]
-): Node<T>
-
-declare export function keyedNodeNS<T>(
+export declare function keyedNodeNS<
+  A extends Attribute<unknown>,
+  C extends Node<unknown>
+>(
   namespace: string,
   localName: string,
-  attributes?: Attribute<T>[],
-  children?: KeyedNode<T>[]
-): Node<T>
+  attributes?: A[],
+  children?: Keyed<C>[]
+): EventNode<A | C>
 
-declare export function nodeNS<T>(
+export declare function nodeNS<
+  A extends Attribute<unknown>,
+  C extends Node<unknown>
+>(
   namespace: string,
   localName: string,
-  attributes?: Attribute<T>[],
-  children?: Node<T>[]
-): Node<T>
+  attributes?: A[],
+  children?: C[]
+): EventNode<A | C>
 
-declare export function text(value: string): Node<never>
-declare export function doc<T>(title: string, body: Node<T>): Doc<T>
+export declare function text(value: string): Node<never>
+export declare function doc<T>(title: string, body: Node<T>): Doc<T>
 
-declare export function property<T>(name: string, value: T): Attribute<never>
-declare export function attribute(
+export declare function property<T>(name: string, value: T): Attribute<never>
+export declare function attribute(
   name: string,
   value: null | string
 ): Attribute<never>
 
-declare export function attributeNS(
+export declare function attributeNS(
   namespace: string,
   name: string,
   value: string | boolean | number | null | void
 ): Attribute<never>
-declare export function style(string, string): Attribute<never>
+export declare function style(string, string): Attribute<never>
 
 export interface Decoder<In, Out> {
-  decode(inn): Out | Error;
+  decode(inn): Out | Error
 }
 
 export type EncodedEvent =
@@ -75,31 +84,29 @@ export type EncodedEvent =
   | KeyboardEvent
   | UIEvent
 
-// Note: Doing optional fields fails Decoder.flow.
-// Doing more fancy unions prevents flow from proper inference.
-export type DecodedEvent<T> =
-  | { message: T }
-  | { preventDefault: boolean }
-  | { stopPropagation: boolean }
-  | { message: T, preventDefault: boolean }
-  | { message: T, stopPropagation: boolean }
-  | { message: T, preventDefault: boolean, stopPropagation: boolean }
-
-export interface EventDecoder<T> extends Decoder<EncodedEvent, DecodedEvent<T>> {
-
+export interface DecodedEvent<T> {
+  message: T
+  preventDefault?: boolean
+  stopPropagation?: boolean
 }
 
-declare export function on<T>(type:string, decoder:EventDecoder<T>): Attribute<T>
+export interface EventDecoder<T>
+  extends Decoder<EncodedEvent, DecodedEvent<T>> {}
+
+export declare function on<T>(
+  type: string,
+  decoder: EventDecoder<T>
+): Attribute<T>
 
 declare class Delta {}
 
 export type { Delta }
 
-declare export function diff<T>(before:Node<T>, after:Node<T>): Delta
-declare export function patch<T>(
+export declare function diff<T>(before: Node<T>, after: Node<T>): Delta
+export declare function patch<T>(
   root: EventTarget,
   current: Node<T>,
   delta: Delta,
   port: Port<T>
 ): void
-declare export function virtualize<T>(EventTarget): Node<T>
+export declare function virtualize<T>(EventTarget): Node<T>

@@ -23,14 +23,6 @@ type Direction = -1 | 1
 type Unit = "line" | "char"
 */
 
-/**
- * @param {string} path
- */
-const fetchStyle = async (path) => {
-  const styleSheet = await fetch(new URL(path, import.meta.url).toString())
-  return await styleSheet.text()
-}
-
 // const style = async () => {
 //   // const [base, theme] = await Promise.all([
 //   //   // fetchStyle("../../modules/codemirror/lib/codemirror.css"),
@@ -41,7 +33,7 @@ const fetchStyle = async (path) => {
 //     outline: none;
 //     contain: content;
 //   }
-  
+
 //   ${base}
 
 //   ${theme}
@@ -94,8 +86,7 @@ class Options {
   set indentUnit(_) {}
 }
 
-const BaseElement /*:typeof HTMLElement*/ = top.HTMLElement
-export default class CodeBlock extends BaseElement {
+export default class CodeBlock extends HTMLElement {
   /*::
   options:Options
   navigationKeys:Object
@@ -137,12 +128,12 @@ export default class CodeBlock extends BaseElement {
     // const editorStyle = this.ownerDocument.createElement("link")
     // editorStyle.setAttribute('rel', 'stylesheet');
     // editorStyle.setAttribute('href', new URL("../../modules/codemirror/lib/codemirror.css", import.meta.url));
-    
+
     const style = this.ownerDocument.createElement("link")
-    style.setAttribute('rel', 'stylesheet');
-    style.setAttribute('href', new URL("./CodeBlock.css", import.meta.url))
+    style.setAttribute("rel", "stylesheet")
+    style.setAttribute("href", new URL("./CodeBlock.css", import.meta.url))
     style.onload = () => this.editor.refresh()
-    
+
     this.root.appendChild(style)
   }
   async connectedCallback() {

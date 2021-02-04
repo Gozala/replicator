@@ -3,6 +3,7 @@ import { text, doc, body, button } from "../../modules/reflex/src/Element.js"
 import { on, className } from "../../modules/reflex/src/Attribute.js"
 import { unreachable } from "../../modules/reflex/src/Basics.js"
 
+import * as Main from "./Main/Main.js"
 import * as Data from "./Main/Data.js"
 import * as Inbox from "./Main/Inbox.js"
 import * as Effect from "./Main/Effect.js"
@@ -10,14 +11,9 @@ import * as Decoder from "./Main/Decoder.js"
 import * as Notebook from "./Notebook.js"
 
 /**
- * @typedef {import('./Main/Data').Model} Model
- * @typedef {import('./Main/Inbox').Message} Message
- */
-
-/**
  *
- * @param {{state?:Model, url:URL}} options
- * @returns
+ * @param {{state?:Main.Model, url:URL}} options
+ * @returns {Main.State}
  */
 export const init = ({ state, url }) => {
   if (state) {
@@ -25,16 +21,17 @@ export const init = ({ state, url }) => {
   } else {
     // const path = url.pathname.substr(1)
     // const notebookURL = path === "" ? null : new URL(`//${path}`, url)
-    const notebookURL = null
-    const [notebook, fx] = Notebook.open(notebookURL)
+    const [notebook, fx] = Notebook.open()
     return [Data.init(notebook), fx.map(Inbox.notebook)]
   }
 }
 
-export const update = (
-  message /*:Message*/,
-  state /*:Model*/
-) /*:[Model, IO<Message>]*/ => {
+/**
+ * @param {Main.Message} message
+ * @param {Main.Model} state
+ * @returns {Main.State}
+ */
+export const update = (message, state) => {
   switch (message.tag) {
     case "notebook": {
       const [notebook, fx] = Notebook.update(
@@ -82,10 +79,16 @@ export const update = (
   }
 }
 
+/**
+ *
+ * @param {Main.Route} message
+ * @param {Main.Model} state
+ * @returns {Main.State}
+ */
 const route = (message, state) => {
   switch (message.tag) {
     case "navigate": {
-      return init(null, message.value)
+      return init({ url: message.value })
     }
     case "navigated": {
       return [state, nofx]
@@ -99,7 +102,11 @@ const route = (message, state) => {
   }
 }
 
-export const view = (state /*:Model*/) =>
+/**
+ * @param {Main.Model} state
+ * @returns {Main.View}
+ */
+export const view = (state) =>
   doc(
     "Interactive Notebook",
     body(
@@ -111,6 +118,9 @@ export const view = (state /*:Model*/) =>
     )
   )
 
+/**
+ * @param {Main.Model} state
+ */
 const viewSaveButton = (state) =>
   button(
     [

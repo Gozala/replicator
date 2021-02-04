@@ -1,20 +1,28 @@
 // @flow strict
 
 import { navigate, load } from "../../Effect/Navigation.js"
-import { writeFile } from "../../Effect/dat.js"
 
-export const save = writeFile
+/**
+ * @param {URL} url
+ * @param {string} content
+ * @param {Object} [options]
+ * @param {number} [options.timeout]
+ */
+export const save = (url, content, options = {}) => async () => {
+  console.log({ save: { url, content, options } })
+}
 
 /**
  * @param {string} content
- * @param {URL} [origin]
+ * @param {URL|null} [origin]
  */
-export const saveAs = (content, origin) => async () => {
-  const name = origin
-    ? origin.pathname.substr(origin.pathname.lastIndexOf("/") + 1)
-    : "stratchpad.js"
-  const encoder = new TextEncoder()
-  return await library.saveFileAs(name, encoder.encode(content).buffer)
-}
+export const saveAs = (content, origin) =>
+  /**
+   * @returns {Promise<URL>}
+   */
+  async () => {
+    console.log({ saveAs: { content, origin } })
+    throw Error("Not implemented")
+  }
 
 export { navigate, load }

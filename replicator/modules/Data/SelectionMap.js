@@ -1,14 +1,13 @@
-// @flow strict
-
 import * as Dict from "./Dictionary.js"
 import * as ImmutableArray from "./ImmutableArray.js"
 
 /**
  * @typedef {string} ID
+ * @typedef {-1|1} Direction
  */
 
 /**
- * @template T
+ * @template {NonNullable<any>} T
  * @typedef {{
  *   nextID: number,
  *   index: ImmutableArray.ImmutableArray<ID>,
@@ -27,20 +26,36 @@ import * as ImmutableArray from "./ImmutableArray.js"
  * }} Mutable
  */
 
-const mutable = /*::<a>*/ () /*:Mutable<a>*/ => ({
+/**
+ * @template T
+ * @returns {Mutable<T>}
+ */
+
+const mutable = () => ({
   nextID: 0,
   index: [],
   values: Dict.empty(),
   selectionIndex: -1,
 })
 
-export const empty = /*::<a>*/ () /*:SelectionMap<a>*/ => mutable()
+/**
+ * @template T
+ * @returns {Mutable<T>}
+ */
+export const empty = () => mutable()
 
-const pairs = /*::<a, b>*/ () /*:Array<[a, b]>*/ => []
+/**
+ * @template T, U
+ * @returns {Array<[T, U]>}
+ */
+const pairs = () => []
 
-export const fromValues = /*::<a>*/ (
-  values /*:Iterable<a>*/
-) /*:SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {Iterable<T>} values
+ * @returns {SelectionMap<T>}
+ */
+export const fromValues = (values) => {
   let nextID = 0
   const entries = pairs()
   const index = []
@@ -53,10 +68,13 @@ export const fromValues = /*::<a>*/ (
   return { nextID, index, values: Dict.from(entries), selectionIndex: -1 }
 }
 
-export const append = /*::<a>*/ (
-  items /*:a[]*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {T[]} items
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const append = (items, data) => {
   let { nextID, selectionIndex } = data
   let index = [...data.index]
   let entries = pairs()
@@ -66,16 +84,19 @@ export const append = /*::<a>*/ (
     entries.push([id, item])
   }
 
-  const values = Dict.insertBatch(entries, data.values)
+  const values = Dict.insertAll(entries, data.values)
   return { selectionIndex, nextID, index, values }
 }
 
-export const insert = /*::<a>*/ (
-  key /*:ID*/,
-  dir /*:-1|1*/,
-  items /*:a[]*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {ID} key
+ * @param {Direction} _dir
+ * @param {T[]} items
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const insert = (key, _dir, items, data) => {
   let { nextID, selectionIndex } = data
   const index = [...data.index]
   let offset = Math.min(Math.max(0, index.indexOf(key) + 1), index.length)
@@ -85,14 +106,18 @@ export const insert = /*::<a>*/ (
     index.splice(offset++, 0, id)
     entries.push([id, item])
   }
-  const values = Dict.insertBatch(entries, data.values)
+  const values = Dict.insertAll(entries, data.values)
   return { selectionIndex, nextID, index, values }
 }
 
-export const remove = /*::<a>*/ (
-  ids /*:ID[]*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {ID[]} ids
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+
+export const remove = (ids, data) => {
   const index = data.index.slice()
   let { selectionIndex } = data
   for (const id of ids) {
@@ -102,51 +127,72 @@ export const remove = /*::<a>*/ (
     }
     index.splice(offset, 1)
   }
-  const keys /*:string[]*/ = ids
-  const values = Dict.removeBatch(keys, data.values)
+  const keys = ids
+  const values = Dict.removeAll(keys, data.values)
 
   return { ...data, index, values }
 }
 
-export const selectedKey = /*::<a>*/ (data /*:SelectionMap<a>*/) /*:?ID*/ =>
-  data.index[data.selectionIndex]
+/**
+ * @template T
+ * @param {SelectionMap<T>} data
+ * @returns {null|ID}
+ */
+export const selectedKey = (data) => data.index[data.selectionIndex] || null
 
-export const selectedValue = /*::<a>*/ (data /*:SelectionMap<a>*/) /*:?a*/ => {
+/**
+ * @template T
+ * @param {SelectionMap<T>} data
+ * @returns {null|T}
+ */
+export const selectedValue = (data) => {
   const id = selectedKey(data)
   return id != null ? Dict.get(id, data.values) : null
 }
 
-export const keyByIndex = /*::<a>*/ (
-  n /*:number*/,
-  data /*:SelectionMap<a>*/
-) /*:?ID*/ => {
+/**
+ * @template T
+ * @param {number} n
+ * @param {SelectionMap<T>} data
+ * @returns {null|ID}
+ */
+export const keyByIndex = (n, data) => {
   const { index } = data
   const offset = n < 0 ? index.length + n : n
-  return index[offset]
+  return index[offset] || null
 }
 
-export const valueByIndex = /*::<a>*/ (
-  n /*:number*/,
-  data /*:SelectionMap<a>*/
-) /*:?a*/ => {
+/**
+ * @template T
+ * @param {number} n
+ * @param {SelectionMap<T>} data
+ * @returns {null|T}
+ */
+export const valueByIndex = (n, data) => {
   const { index, values } = data
   const offset = n < 0 ? index.length + n : n
   const id = index[offset]
   if (id != null) {
-    return Dict.get(id, data.values)
+    return Dict.get(id, values)
   } else {
     return null
   }
 }
 
-export const valueByKey = /*::<a>*/ (
-  key /*:ID*/,
-  data /*:SelectionMap<a>*/
-) /*:?a*/ => Dict.get(key, data.values)
+/**
+ * @template T
+ * @param {ID} key
+ * @param {SelectionMap<T>} data
+ * @returns {T|null}
+ */
+export const valueByKey = (key, data) => Dict.get(key, data.values)
 
-export const selectedEntry = /*::<a>*/ (
-  data /*:SelectionMap<a>*/
-) /*:?[ID, a]*/ => {
+/**
+ * @template T
+ * @param {SelectionMap<T>} data
+ * @returns {[ID, T]|null}
+ */
+export const selectedEntry = (data) => {
   const id = selectedKey(data)
   if (id == null) {
     return null
@@ -156,20 +202,29 @@ export const selectedEntry = /*::<a>*/ (
   }
 }
 
-export const deselect = /*::<a>*/ (
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => ({ ...data, selectionIndex: -1 })
+/**
+ * @template T
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const deselect = (data) => ({ ...data, selectionIndex: -1 })
 
-export const select = /*::<a>*/ (
-  value /*:a*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => selectBy(($) => $ === value, data)
+/**
+ * @template T
+ * @param {T} value
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const select = (value, data) => selectBy(($) => $ === value, data)
 
-export const selectBy = /*::<a>*/ (
-  predicate /*:a => boolean*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => {
-  const { nextID, index, values } = data
+/**
+ * @template T
+ * @param {(value:T) => boolean} predicate
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const selectBy = (predicate, data) => {
+  const { index, values } = data
   const id = Dict.findKey(predicate, values)
   const selectionIndex = id == null ? -1 : index.indexOf(id)
 
@@ -180,33 +235,42 @@ export const selectBy = /*::<a>*/ (
   }
 }
 
-export const selectByKey = /*::<a>*/ (
-  key /*:ID*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {ID} key
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const selectByKey = (key, data) => {
   const selectionIndex = data.index.indexOf(key)
   return { ...data, selectionIndex }
 }
 
-export const keyByOffset = /*::<a>*/ (
-  offset /*:number*/,
-  key /*:ID*/,
-  { index } /*:SelectionMap<a>*/
-) /*:?ID*/ => {
+/**
+ * @template T
+ * @param {number} offset
+ * @param {ID} key
+ * @param {SelectionMap<T>} data
+ * @returns {ID|null}
+ */
+export const keyByOffset = (offset, key, { index }) => {
   const keyIndex = index.indexOf(key)
   const targetIndex = keyIndex + offset
   if (keyIndex < 0 || targetIndex < 0 || targetIndex >= index.length) {
     return null
   } else {
-    return index[targetIndex]
+    return index[targetIndex] || null
   }
 }
 
-export const selectByOffset = /*::<a>*/ (
-  offset /*:number*/,
-  loop /*:boolean*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {number} offset
+ * @param {boolean} loop
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const selectByOffset = (offset, loop, data) => {
   let selectionIndex = data.selectionIndex + offset
   const count = data.index.length
   if (loop) {
@@ -225,18 +289,26 @@ export const selectByOffset = /*::<a>*/ (
   return { ...data, selectionIndex }
 }
 
-export const map = /*::<a, b>*/ (
-  f /*:(a) => b*/,
-  data /*:SelectionMap<a>*/
-) /*: SelectionMap<b>*/ => {
+/**
+ * @template T
+ * @template {NonNullable<any>} U
+ * @param {(value:T) => U} f
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<U>}
+ */
+export const map = (f, data) => {
   const { nextID, index, selectionIndex, values } = data
-  return { nextID, index, selectionIndex, values: Dict.map(f, data.values) }
+  return { nextID, index, selectionIndex, values: Dict.map(f, values) }
 }
 
-export const filter = /*::<a>*/ (
-  predicate /*:a => boolean*/,
-  data /*:SelectionMap<a>*/
-) /*: SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {(value:T) => boolean} predicate
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+
+export const filter = (predicate, data) => {
   const { nextID, index, selectionIndex, values } = data
   const nextIndex = []
   const entries = pairs()
@@ -246,7 +318,7 @@ export const filter = /*::<a>*/ (
     if (value != null && predicate(value)) {
       nextIndex.push(id)
       entries.push([id, value])
-    } else if (id === nextSelectionIndex) {
+    } else if (id === `${nextSelectionIndex}`) {
       nextSelectionIndex = -1
     }
   }
@@ -259,9 +331,12 @@ export const filter = /*::<a>*/ (
   }
 }
 
-export const entries = function* entries /*::<a>*/(
-  data /*:SelectionMap<a>*/
-) /*: Iterable<[ID, a, boolean]>*/ {
+/**
+ * @template T
+ * @param {SelectionMap<T>} data
+ * @returns {Iterable<[ID, T, boolean]>} data
+ */
+export const entries = function* entries(data) {
   const { index, selectionIndex, values } = data
   let offset = 0
   for (const id of index) {
@@ -273,36 +348,53 @@ export const entries = function* entries /*::<a>*/(
   }
 }
 
-export const count = /*::<a>*/ (data /*:SelectionMap<a>*/) /*: number*/ =>
-  data.index.length
+/**
+ * @template T
+ * @param {SelectionMap<T>} data
+ * @returns {number}
+ */
+export const count = (data) => data.index.length
 
-export const keys = /*::<a>*/ (data /*:SelectionMap<a>*/) /*: Iterable<ID>*/ =>
-  data.index
+/**
+ * @template T
+ * @param {SelectionMap<T>} data
+ * @returns {Iterable<ID>}
+ */
+export const keys = (data) => data.index
 
-export const values = function* values /*::<a>*/(
-  data /*:SelectionMap<a>*/
-) /*: Iterable<a>*/ {
+/**
+ * @template T
+ * @param {SelectionMap<T>} data
+ * @returns {Iterable<T>}
+ */
+export const values = function* values(data) {
   for (const [, value] of entries(data)) {
     yield value
   }
 }
 
-export const replaceWith = /*::<a>*/ (
-  key /*:ID*/,
-  replace /*:?a => ?a*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {ID} key
+ * @param {(value?:T) => T|null|undefined} replace
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const replaceWith = (key, replace, data) => {
   const values = Dict.replaceWith(key, replace, data.values)
 
   return values === data.values ? data : { ...data, values }
 }
 
-export const join = /*::<a>*/ (
-  join /*:(a, a) => a*/,
-  key /*:ID*/,
-  dir /*:-1|1*/,
-  data /*:SelectionMap<a>*/
-) /*:SelectionMap<a>*/ => {
+/**
+ * @template T
+ * @param {(left:T, right:T) => T} join
+ * @param {ID} key
+ * @param {Direction} dir
+ * @param {SelectionMap<T>} data
+ * @returns {SelectionMap<T>}
+ */
+export const join = (join, key, dir, data) => {
   const { index, selectionIndex, values } = data
   if (index.length <= 1) {
     return data
@@ -314,7 +406,10 @@ export const join = /*::<a>*/ (
     if (leftIndex < 0 || rightIndex > index.length) {
       return data
     } else {
-      const [leftKey, rightKey] = [index[leftIndex], index[rightIndex]]
+      const [leftKey, rightKey] = [
+        /** @type {string} */ (index[leftIndex]),
+        /** @type {string} */ (index[rightIndex]),
+      ]
       const [left, right] = [
         Dict.get(leftKey, values),
         Dict.get(rightKey, values),

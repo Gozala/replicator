@@ -1,10 +1,9 @@
-// @flow strict
-
-import * as Decoder from "../../../modules/Decoder.flow/Decoder.js"
+import * as Decoder from "../../../modules/Decoder/Decoder.js"
+import { the } from "../../../modules/Data/Basic.js"
 
 export const save = Decoder.ok({
   message: {
-    tag: "save",
-    value: true,
+    tag: the("save"),
+    value: the(true),
   },
 })

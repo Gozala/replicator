@@ -1,63 +1,77 @@
-// @flow strict
-
+import * as Main from "./Main.js"
 import * as Notebook from "../Notebook/Data.js"
 import { always } from "../../../modules/reflex/src/Basics.js"
 
+const saving = always(/** @type {Main.SaveRequest} */ ({ tag: "Saving" }))
+const notSaving = always(/** @type {Main.SaveRequest} */ ({ tag: "NotSaving" }))
+
 /**
- * @typedef {{
- *   notebook: MaybeSaved<Notebook.Model>;
- *   saveRequest:SaveRequest;
- * }} Model
  *
- * @typedef {never
- * | { tag: "NotSaving" }
- * | { tag: "Saving" }
- * | { tag: "SavingFailed", value:Error }
- * } SaveRequest
+ * @param {Error} error
+ * @returns {Main.SaveRequest}
  */
-
-/**
- * @template Doc
- * @typedef {{before:Doc; after:Doc;}} MaybeSaved<Doc>
- */
-
-const saving = always({ tag: "Saving" })
-const notSaving = always({ tag: "NotSaving" })
 const savingFailed = (error /*:Error*/) => ({
   tag: "SavingFailed",
   value: error,
 })
 
-export const init = (notebook /*:Notebook.Model*/) /*:Model*/ => ({
+/**
+ *
+ * @param {Main.Notebook.Model} notebook
+ * @returns {Main.Model}
+ */
+export const init = (notebook) => ({
   saveRequest: { tag: "NotSaving" },
   notebook: { before: notebook, after: notebook },
 })
 
-export const saved = (state /*:Model*/) /*:Model*/ => ({
+/**
+ * @param {Main.Model} state
+ * @returns {Main.Model}
+ */
+export const saved = (state) => ({
   ...state,
   saveRequest: notSaving(),
 })
 
-export const published = (url /*:URL*/, state /*:Model*/) /*:Model*/ => ({
+/**
+ *
+ * @param {URL} url
+ * @param {Main.Model} state
+ * @returns {Main.Model}
+ */
+export const published = (url, state) => ({
   ...updateNotebook(state, Notebook.updateURL(url, true, notebook(state))),
   saveRequest: notSaving(),
 })
 
-export const saveFailed = (error /*:Error*/, state /*:Model*/) /*:Model*/ => ({
+/**
+ *
+ * @param {Error} error
+ * @param {Main.Model} state
+ * @returns {Main.Model}
+ */
+export const saveFailed = (error, state) => ({
   ...state,
   saveRequest: savingFailed(error),
 })
 
-export const save = (state /*:Model*/) /*:Model*/ => ({
+/**
+ * @param {Main.Model} state
+ * @returns {Main.Model}
+ */
+export const save = (state) => ({
   ...state,
   saveRequest: saving(),
   notebook: { before: state.notebook.after, after: state.notebook.after },
 })
 
-export const updateNotebook = (
-  state /*:Model*/,
-  notebook /*:Notebook.Model*/
-) /*:Model*/ => {
+/**
+ * @param {Main.Model} state
+ * @param {Main.Notebook.Model} notebook
+ * @returns {Main.Model}
+ */
+export const updateNotebook = (state, notebook) => {
   const { before } = state.notebook
   const notebookBefore = before.status !== notebook.status ? notebook : before
 
@@ -67,22 +81,43 @@ export const updateNotebook = (
   }
 }
 
-export const notebook = (state /*:Model*/) /*:Notebook.Model*/ =>
-  state.notebook.after
+/**
+ * @param {Main.Model} state
+ * @returns {Main.Notebook.Model}
+ */
+export const notebook = (state) => state.notebook.after
 
-export const isModified = (state /*:Model*/) /*:boolean*/ =>
+/**
+ * @param {Main.Model} state
+ * @returns {boolean}
+ */
+export const isModified = (state) =>
   Notebook.textInput(state.notebook.before) !==
   Notebook.textInput(state.notebook.after)
 
-export const toURL = (state /*:Model*/) /*:?URL*/ => notebook(state).url
+/**
+ * @param {Main.Model} state
+ * @returns {URL|null}
+ */
+export const toURL = (state) => notebook(state).url
 
-export const toText = (state /*:Model*/) /*:string*/ =>
-  Notebook.textInput(notebook(state))
+/**
+ * @param {Main.Model} state
+ * @returns {string}
+ */
+export const toText = (state) => Notebook.textInput(notebook(state))
 
-export const isOwner = (state /*:Model*/) /*:boolean*/ =>
-  notebook(state).isOwner
+/**
+ * @param {Main.Model} state
+ * @returns {boolean}
+ */
+export const isOwner = (state) => notebook(state).isOwner
 
-export const status = (state /*:Model*/) /*:string*/ => {
+/**
+ * @param {Main.Model} state
+ * @returns {string}
+ */
+export const status = (state) => {
   switch (state.saveRequest.tag) {
     case "NotSaving": {
       return isModified(state) ? "" : "published"

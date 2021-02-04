@@ -1,19 +1,15 @@
-// @flow strict
-
+import * as Notebook from "./Notebook.js"
 import * as Cell from "../Cell/Data.js"
 import * as SelectionMap from "../../../modules/Data/SelectionMap.js"
 
 /**
- * @typedef {SelectionMap.ID} ID
- * @typedef {{
- *  url: ?URL
- *  isOwner: boolean
- *  nextID: number
- *  status: "loading"|"ready"|"error";
- *  cells: SelectionMap.SelectionMap<Cell.Model>
- * }} Model
+ * @param {URL|null} url
+ * @param {boolean} isOwner
+ * @param {number} nextID
+ * @param {Notebook.Status} status
+ * @param {Notebook.Cells} cells
+ * @returns {Notebook.Model}
  */
-
 const notebook = (
   url,
   isOwner,
@@ -28,11 +24,14 @@ const notebook = (
   cells,
 })
 
-export const init = (
-  url /*:?URL*/,
-  isOwner /*:boolean*/,
-  input /*:string*/
-) /*:Model*/ => {
+/**
+ *
+ * @param {URL|null} url
+ * @param {boolean} isOwner
+ * @param {string} input
+ * @returns {Notebook.Model}
+ */
+export const init = (url, isOwner, input) => {
   const cells = []
   let n = 0
   let baseURL = url ? `${url.href}#` : "#"
@@ -42,7 +41,7 @@ export const init = (
     cells.push(Cell.init(`${baseURL}${++n}`, token))
   }
 
-  const [cell] = cells
+  const cell = /** @type {Notebook.Cell.Model} */ (cells[0])
   return notebook(
     url,
     isOwner,
@@ -52,14 +51,19 @@ export const init = (
   )
 }
 
-export const load = (url /*:URL*/) /*:Model*/ =>
-  notebook(url, false, 0, "loading")
+/**
+ * @param {URL} url
+ * @returns {Notebook.Model}
+ */
+export const load = (url) => notebook(url, false, 0, "loading")
 
-export const updateURL = (
-  url /*:URL*/,
-  isOwner /*:boolean*/,
-  state /*:Model*/
-) /*:Model*/ => ({
+/**
+ * @param {URL} url
+ * @param {boolean} isOwner
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const updateURL = (url, isOwner, state) => ({
   ...state,
   cells: SelectionMap.map(
     (cell) =>
@@ -70,13 +74,20 @@ export const updateURL = (
   isOwner,
 })
 
-export const failLoad = (state /*:Model*/) =>
+/**
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const failLoad = (state) =>
   state.status === "loading" ? { ...state, status: "error" } : state
 
-export const append = (
-  entries /*:{input:string}[]*/,
-  state /*:Model*/
-) /*:Model*/ => {
+/**
+ *
+ * @param {{input:string}[]} entries
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const append = (entries, state) => {
   const { url, nextID } = state
   const $ = url ? `${url.href}#` : `#`
   const cells = SelectionMap.append(
@@ -87,12 +98,14 @@ export const append = (
   return { ...state, cells, nextID: nextID + entries.length }
 }
 
-export const insert = (
-  id /*:ID*/,
-  dir /*:1|-1*/,
-  entries /*:{input:string}[]*/,
-  state /*:Model*/
-) /*:Model*/ => {
+/**
+ * @param {Notebook.ID} id
+ * @param {Notebook.Cell.Direction} dir
+ * @param {{input:string}[]} entries
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const insert = (id, dir, entries, state) => {
   const { url, nextID } = state
   const $ = url ? `${url.href}#` : `#`
 
@@ -106,16 +119,24 @@ export const insert = (
   return { ...state, cells, nextID: nextID + entries.length }
 }
 
-export const removeCells = (ids /*:ID[]*/, state /*:Model*/) /*:Model*/ => {
+/**
+ * @param {Notebook.ID[]} ids
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const removeCells = (ids, state) => {
   const cells = SelectionMap.remove(ids, state.cells)
   return { ...state, cells }
 }
 
-export const replaceCell = (
-  id /*:ID*/,
-  cell /*:Cell.Model*/,
-  state /*:Model*/
-) => ({
+/**
+ *
+ * @param {Notebook.ID} id
+ * @param {Notebook.Cell.Model} cell
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const replaceCell = (id, cell, state) => ({
   ...state,
   cells: SelectionMap.replaceWith(
     id,
@@ -124,7 +145,13 @@ export const replaceCell = (
   ),
 })
 
-export const joinCell = (id /*:ID*/, dir /*:-1|1*/, state /*:Model*/) => {
+/**
+ * @param {Notebook.ID} id
+ * @param {Notebook.Direction} dir
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const joinCell = (id, dir, state) => {
   const cells = SelectionMap.join(
     (left, right) =>
       Cell.init(left.id, `${left.input}\n${right.input}`, right.output),
@@ -135,51 +162,81 @@ export const joinCell = (id /*:ID*/, dir /*:-1|1*/, state /*:Model*/) => {
   return { ...state, cells }
 }
 
-export const cellByID = (id /*:ID*/, state /*:Model*/) /*:?Cell.Model*/ =>
-  SelectionMap.valueByKey(id, state.cells)
+/**
+ * @param {Notebook.ID} id
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Cell.Model|null}
+ */
+export const cellByID = (id, state) => SelectionMap.valueByKey(id, state.cells)
 
-export const cells = (
-  state /*:Model*/
-) /*:Array<[ID, Cell.Model, boolean]>*/ => [
+/**
+ * @param {Notebook.Model} state
+ */
+export const cells = (state /*:Model*/) => [
   ...SelectionMap.entries(state.cells),
 ]
 
-export const changeCellSelection = (
-  offset /*:number*/,
-  loop /*:boolean*/,
-  state /*:Model*/
-) => ({
+/**
+ *
+ * @param {number} offset
+ * @param {boolean} loop
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const changeCellSelection = (offset, loop, state) => ({
   ...state,
   cells: SelectionMap.selectByOffset(offset, loop, state.cells),
 })
 
-export const selectByID = (id /*:ID*/, state /*:Model*/) => ({
+/**
+ * @param {Notebook.ID} id
+ * @param {Notebook.Model} state
+ * @returns {Notebook.Model}
+ */
+export const selectByID = (id, state) => ({
   ...state,
   cells: SelectionMap.selectByKey(id, state.cells),
 })
 
-export const selectedCellID = (state /*:Model*/) /*:?ID*/ =>
-  SelectionMap.selectedKey(state.cells)
+/**
+ * @param {Notebook.Model} state
+ */
+export const selectedCellID = (state) => SelectionMap.selectedKey(state.cells)
 
-export const selectedCell = (state /*:Model*/) /*:?Cell.Model*/ =>
-  SelectionMap.selectedValue(state.cells)
+/**
+ * @param {Notebook.Model} state
+ */
+export const selectedCell = (state) => SelectionMap.selectedValue(state.cells)
 
-export const selection = (state /*:Model*/) /*:?[ID, Cell.Model]*/ =>
-  SelectionMap.selectedEntry(state.cells)
+/**
+ * @param {Notebook.Model} state
+ */
+export const selection = (state) => SelectionMap.selectedEntry(state.cells)
 
-export const lastCell = (state /*:Model*/) /*:?Cell.Model*/ =>
-  SelectionMap.valueByIndex(-1, state.cells)
+/**
+ * @param {Notebook.Model} state
+ */
+export const lastCell = (state) => SelectionMap.valueByIndex(-1, state.cells)
 
-export const firstCell = (state /*:Model*/) /*:?Cell.Model*/ =>
-  SelectionMap.valueByIndex(0, state.cells)
+/**
+ * @param {Notebook.Model} state
+ */
+export const firstCell = (state) => SelectionMap.valueByIndex(0, state.cells)
 
-export const firstID = (state /*:Model*/) /*:?ID*/ =>
-  SelectionMap.keyByIndex(0, state.cells)
+/**
+ * @param {Notebook.Model} state
+ */
+export const firstID = (state) => SelectionMap.keyByIndex(0, state.cells)
 
-export const lastID = (state /*:Model*/) /*:?ID*/ =>
-  SelectionMap.keyByIndex(-1, state.cells)
+/**
+ * @param {Notebook.Model} state
+ */
+export const lastID = (state) => SelectionMap.keyByIndex(-1, state.cells)
 
-export const textInput = (state /*:Model*/) /*:string*/ => {
+/**
+ * @param {Notebook.Model} state
+ */
+export const textInput = (state) => {
   const chunks = []
   for (const value of SelectionMap.values(state.cells)) {
     chunks.push(Cell.input(value))
@@ -187,8 +244,11 @@ export const textInput = (state /*:Model*/) /*:string*/ => {
   return chunks.join("\n\n")
 }
 
-export const idByOffset = (
-  offset /*:number*/,
-  id /*:ID*/,
-  state /*:Model*/
-) /*:?ID*/ => SelectionMap.keyByOffset(offset, id, state.cells)
+/**
+ *
+ * @param {number} offset
+ * @param {Notebook.ID} id
+ * @param {Notebook.Model} state
+ */
+export const idByOffset = (offset, id, state) =>
+  SelectionMap.keyByOffset(offset, id, state.cells)

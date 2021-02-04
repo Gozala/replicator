@@ -1,27 +1,10 @@
 import { always } from "../../../modules/reflex/src/Basics.js"
-/**
- * @typedef {import('../Notebook').Message} NotebookMessage
- *
- * @typedef {never
- * | { tag: "navigate", value:URL }
- * | { tag: "load", value:URL }
- * | { tag: "navigated", value:URL }
- * } Route
- *
- * @typedef {never
- * | { tag: "route", value: Route }
- * | { tag: "notebook", value: NotebookMessage }
- * | { tag: "save", value:true }
- * | { tag: "published", value:URL }
- * | { tag: "saved", value:true }
- * | { tag: "saveError", value:Error }
- * } Message
- */
+import * as Main from "./Main.js"
 
 /**
  *
- * @param {NotebookMessage} value
- * @returns {Message}
+ * @param {Main.Notebook.Message} value
+ * @returns {Main.Message}
  */
 export const notebook = (value) => ({
   tag: "notebook",
@@ -30,21 +13,21 @@ export const notebook = (value) => ({
 
 /**
  *
- * @param {Route} value
- * @returns {Message}
+ * @param {Main.Route} value
+ * @returns {Main.Message}
  */
 export const route = (value) => ({
   tag: "route",
   value,
 })
 
-/** @type {() => Message} */
+/** @type {() => Main.Message} */
 export const onSaved = always({ tag: "saved", value: true })
 
 /**
  *
  * @param {Error} value
- * @returns {Message}
+ * @returns {Main.Message}
  */
 export const onSaveError = (value) => ({
   tag: "saveError",
@@ -54,7 +37,7 @@ export const onSaveError = (value) => ({
 /**
  *
  * @param {URL} value
- * @returns {Message}
+ * @returns {Main.Message}
  */
 export const onPublished = (value /*: URL*/) => ({
   tag: "published",
@@ -63,18 +46,18 @@ export const onPublished = (value /*: URL*/) => ({
 
 /**
  * @param {URL} value
- * @returns {Message}
+ * @returns {Main.Message}
  */
 export const onInternalURLRequest = (value) => route({ tag: "navigate", value })
 
 /**
  * @param {URL} value
- * @returns {Message}
+ * @returns {Main.Message}
  */
 export const onExternalURLRequest = (value) => route({ tag: "load", value })
 
 /**
  * @param {URL} value
- * @returns {Message}
+ * @returns {Main.Message}
  */
 export const onURLChange = (value) => route({ tag: "navigated", value })

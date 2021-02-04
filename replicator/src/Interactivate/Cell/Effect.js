@@ -1,4 +1,6 @@
+import * as Cell from "./Cell.js"
 import { request } from "../../Effect/worker.js"
+import * as Decoder from "../../../modules/Decoder/Decoder.js"
 
 /**
  * @param {string} name
@@ -26,11 +28,11 @@ const generateBindings = ({ bindings }) => {
 let lastEvalindex = 0
 
 /**
- * @param {string} url
+ * @param {string} _url
  * @param {string} code
  * @returns
  */
-export const evaluate = (url, code) => async () => {
+export const evaluate = (_url, code) => async () => {
   const id = `ø${++lastEvalindex}${Date.now().toString(32)}`
   const index = Math.max(code.lastIndexOf("\n"), 0)
   const expression = code.slice(code.indexOf(":", index) + 1).trim()
@@ -43,11 +45,11 @@ export const evaluate = (url, code) => async () => {
         throw new SyntaxError(result.error.message)
       }
       default: {
-        throw new Error(result.error)
+        throw new Error(result.error.message)
       }
     }
   } else {
-    const sourceURL = `\n//# sourceURL=${url}`
+    // const sourceURL = `\n//# sourceURL=${url}`
     const refs = generateBindings(result.ok)
     const out = expression === "" ? "void 0" : expression
     const code = `${source}\nexport const ${id}=[${out},${refs}]`
@@ -61,11 +63,11 @@ export const evaluate = (url, code) => async () => {
 }
 
 /**
- * @param {string} code 
+ * @param {string} code
  */
 const importCode = async (code) => {
   const blob = new Blob([code], {
-    type: "text/javascript"
+    type: "text/javascript",
   })
   const url = URL.createObjectURL(blob)
   try {
@@ -78,7 +80,7 @@ const importCode = async (code) => {
 /**
  *
  * @param {string} id
- * @param {string} dir
+ * @param {Cell.Direction} dir
  * @returns
  */
 export const setSelection = (id, dir) => async () => {
@@ -95,7 +97,30 @@ export const setSelection = (id, dir) => async () => {
 
 const analyzer = new URL("../Worker/analyzer.bundle.js", import.meta.url)
 
+const analyzeResult = Decoder.or(
+  Decoder.record({
+    ok: Decoder.record({
+      bindings: Decoder.array(Decoder.Text),
+    }),
+  }),
+  Decoder.record({
+    error: Decoder.record({
+      name: Decoder.Text,
+      message: Decoder.Text,
+    }),
+  })
+)
+
 /**
  * @param {string} source
+ * @returns {Promise<Cell.AnalyzeResult>}
  */
-const analyze = (source) => request(analyzer, source)
+const analyze = async (source) => {
+  const data = await request(analyzer, source)
+  const result = analyzeResult.decode(data)
+  if (result instanceof Error) {
+    return { error: result }
+  } else {
+    return result
+  }
+}

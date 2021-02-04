@@ -1,8 +1,13 @@
 // @flow strict
 
-import { attribute, on } from "../../modules/reflex/src/VirtualDOM.js"
+import { on } from "../../modules/reflex/src/VirtualDOM.js"
 import { section, customElement } from "../../modules/reflex/src/Element.js"
-import { className, property, tabIndex, id } from "../../modules/reflex/src/Attribute.js"
+import {
+  className,
+  property,
+  tabIndex,
+  id,
+} from "../../modules/reflex/src/Attribute.js"
 import { unreachable } from "../../modules/reflex/src/Basics.js"
 import { nofx, fx, send, batch } from "../../modules/reflex/src/Effect.js"
 import InspectBlock from "../Element/InspectBlock.js"
@@ -12,13 +17,14 @@ import * as Data from "./Cell/Data.js"
 import * as Inbox from "./Cell/Inbox.js"
 import * as Decoder from "./Cell/Decoder.js"
 import * as Effect from "./Cell/Effect.js"
+import * as Cell from "./Cell/Cell.js"
 
-/*::
-import type { Node } from "../reflex/VirtualDOM.js"
-export type Model = Data.Model
-export type Message = Inbox.Message
-*/
-
+/**
+ *
+ * @param {Cell.Message} message
+ * @param {Cell.Model} state
+ * @returns {Cell.State}
+ */
 export const update = (message /*:Message*/, state /*:Model*/) => {
   switch (message.tag) {
     case "change": {
@@ -38,7 +44,7 @@ export const update = (message /*:Message*/, state /*:Model*/) => {
           for (const input of rest) {
             inserts.push({ input })
           }
-          const replace = send(Inbox.change(token))
+          const replace = send(Inbox.change(/** @type {string} */ (token)))
           const insert = send(Inbox.insert(inserts))
           return [cell, batch(replace, insert)]
         }
@@ -78,30 +84,45 @@ export const update = (message /*:Message*/, state /*:Model*/) => {
   }
 }
 
-export const setSelection = (
-  direction /*:-1|1*/,
-  id /*:string*/,
-  state /*:Model*/
-) => {
-  return [state, fx(Effect.setSelection(`cell-${id}`, direction))]
+/**
+ *
+ * @param {Cell.Direction} direction
+ * @param {string} id
+ * @param {Cell.Model} model
+ * @returns {Cell.State}
+ */
+export const setSelection = (direction, id, model) => {
+  return [model, fx(Effect.setSelection(`cell-${id}`, direction))]
 }
 
-export const view = (
-  state /*:Model*/,
-  key /*:string*/,
-  focused /*:boolean*/
-) /*:Node<Message>*/ =>
+/**
+ * @param {Cell.Model} model
+ * @param {string} key
+ * @param {boolean} focused
+ * @returns {Cell.View}
+ */
+export const view = ({ input, output }, key, focused) =>
   section(
     [className(`cell bl ${focused ? "b--silver" : "b--transparent"}`)],
-    [viewCodeBlock(state.input, key), viewOutput(state.output, key)]
+    [viewCodeBlock(input, key), viewOutput(output, key)]
   )
 
-const viewOutput = (result, key) =>
+/**
+ * @param {Cell.Output|undefined} result
+ * @param {string} _key
+ * @returns {Cell.View}
+ */
+const viewOutput = (result, _key) =>
   customElement("inspect-block", InspectBlock, [
     className("flex"),
     property("target", result),
   ])
 
+/**
+ * @param {string} input
+ * @param {string} key
+ * @returns {Cell.View}
+ */
 const viewCodeBlock = (input, key) =>
   customElement("code-block", CodeBlock, [
     id(key),

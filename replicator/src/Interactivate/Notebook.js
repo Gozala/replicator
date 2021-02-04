@@ -3,6 +3,7 @@ import { article, header, div, form } from "../../modules/reflex/src/Element.js"
 import { className } from "../../modules/reflex/src/Attribute.js"
 import { unreachable } from "../../modules/reflex/src/Basics.js"
 
+import * as Notebook from "./Notebook/Notebook.js"
 import * as Data from "./Notebook/Data.js"
 import * as Inbox from "./Notebook/Inbox.js"
 import { keyedNode } from "../../modules/reflex/src/VirtualDOM.js"
@@ -10,9 +11,7 @@ import * as Cell from "./Cell.js"
 import * as Effect from "./Notebook/Effect.js"
 
 /**
- * @typedef {import('./Notebook/Data').Model} Model
- * @typedef {import('./Notebook/Inbox').Message} Message
- * @returns {Model}
+ * @returns {Notebook.State}
  */
 export const init = () => {
   const state = Data.init(null, true, `show: "Hello"`)
@@ -29,6 +28,7 @@ export const init = () => {
 
 /**
  * @param {URL} url
+ * @returns {Notebook.State}
  */
 export const load = (url) => [
   Data.load(url),
@@ -41,7 +41,13 @@ export const load = (url) => [
  */
 export const open = (url /*:?URL*/) => (url ? load(url) : init())
 
-export const update = (message /*:Message*/, state /*:Model*/) => {
+/**
+ *
+ * @param {Notebook.Message} message
+ * @param {Notebook.Model} state
+ * @returns {Notebook.State}
+ */
+export const update = (message, state) => {
   switch (message.tag) {
     case "onLoaded": {
       const { url, content, isOwner } = message.value
@@ -67,6 +73,13 @@ export const update = (message /*:Message*/, state /*:Model*/) => {
   }
 }
 
+/**
+ *
+ * @param {Notebook.Model} state
+ * @param {Notebook.ID} id
+ * @param {Notebook.Cell.Message} message
+ * @returns {Notebook.State}
+ */
 const updateCell = (state, id, message) => {
   switch (message.tag) {
     case "output":
@@ -135,6 +148,12 @@ const updateCell = (state, id, message) => {
   }
 }
 
+/**
+ *
+ * @param {Notebook.Direction} dir
+ * @param {Notebook.Model} state
+ * @returns {Notebook.State}
+ */
 const setSelection = (dir, state) => {
   let data = Data.changeCellSelection(dir, true, state)
   const selection = Data.selection(data)
@@ -147,6 +166,10 @@ const setSelection = (dir, state) => {
   }
 }
 
+/**
+ * @param {Notebook.Model} state
+ * @returns {Notebook.View}
+ */
 export const view = (state /*:Model*/) =>
   form(
     [className(`w-100 h-100 load ${state.status}`)],
@@ -159,6 +182,10 @@ export const view = (state /*:Model*/) =>
     ]
   )
 
+/**
+ * @param {Notebook.Model} state
+ * @returns {Notebook.View}
+ */
 const viewHeader = (state) =>
   header(
     [
@@ -196,6 +223,9 @@ const viewHeader = (state) =>
     ]
   )
 
+/**
+ * @param {Notebook.Model} state
+ */
 const viewDocument = (state) =>
   keyedNode(
     "main",
@@ -203,6 +233,10 @@ const viewDocument = (state) =>
     Data.cells(state).map(viewCell)
   )
 
+/**
+ * @param {[string, Notebook.Cell.Model, boolean]} state
+ * @returns {[string, Notebook.View]}
+ */
 const viewCell = ([key, cell, focused]) => [
   key,
   Cell.view(cell, `cell-${key}`, focused).map(Inbox.onCell(key)),

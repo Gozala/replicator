@@ -1,24 +1,9 @@
-/**
- * @typedef {-1|1} Direction
- *
- * @typedef {never
- * | { tag:"change", value:string }
- * | { tag:"leave", value:Direction }
- * | { tag:"remove", value:Direction }
- * | { tag:"split" }
- * | { tag:"focus" }
- * | { tag:"output", value:unknown }
- * | { tag:"insert", value:{input:string}[] }
- * | { tag:"execute" }
- * | { tag:"join", value:Direction}
- * | { tag:"print" }
- * } Message
- */
+import * as Cell from "./Cell.js"
 
 /**
  *
  * @param {string} value
- * @returns {Message}
+ * @returns {Cell.Message}
  */
 export const change = (value) => ({
   tag: "change",
@@ -27,8 +12,8 @@ export const change = (value) => ({
 
 /**
  *
- * @param {unknown} value
- * @returns {Message}
+ * @param {Cell.Output} value
+ * @returns {Cell.Message}
  */
 export const output = (value) => ({
   tag: "output",
@@ -36,9 +21,8 @@ export const output = (value) => ({
 })
 
 /**
- *
- * @param {Direction} dir
- * @returns {Message}
+ * @param {Cell.Direction} dir
+ * @returns {Cell.Message}
  */
 export const join = (dir) => ({
   tag: "join",
@@ -46,9 +30,8 @@ export const join = (dir) => ({
 })
 
 /**
- *
- * @param {{input:string}[]} entries
- * @returns {Message}
+ * @param {Cell.Input[]} entries
+ * @returns {Cell.Message}
  */
 export const insert = (entries) => ({
   tag: "insert",
@@ -56,11 +39,11 @@ export const insert = (entries) => ({
 })
 
 /**
- * @returns {Message}
+ * @returns {Cell.Message}
  */
 export const print = () => ({ tag: "print" })
 
 /**
- * @returns {Message}
+ * @returns {Cell.Message}
  */
 export const execute = () => ({ tag: "execute" })

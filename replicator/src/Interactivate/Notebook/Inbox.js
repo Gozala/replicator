@@ -1,44 +1,51 @@
 // @flow strict
 
+import * as Notebook from "./Notebook.js"
 import * as Inbox from "../Cell/Inbox.js"
+
 /**
- * @typedef {import('./Data').ID} ID
- * @typedef {never
- * | { tag: "onLoaded", value: {content:string, url:URL, isOwner:boolean } }
- * | { tag: "onLoadError", value:Error }
- * | { tag: "onCell", value:[ID, Inbox.Message] }
- * | { tag: "onCellChanged", value:ID }
- * } Message
+ * @param {Notebook.ID} key
  */
-
-const route = (message /*:Message*/) => {}
-
-export const onCell = (key /*:ID*/) => (
-  value /*:Inbox.Message*/
-) /*:Message*/ => {
-  switch (value.tag) {
-    case "print": {
-      return { tag: "onCellChanged", value: key }
-    }
-    default: {
-      return { tag: "onCell", value: [key, value] }
+export const onCell = (key) =>
+  /**
+   * @param {Notebook.Cell.Message} value
+   * @returns {Notebook.Message}
+   */
+  (value) => {
+    switch (value.tag) {
+      case "print": {
+        return { tag: "onCellChanged", value: key }
+      }
+      default: {
+        return { tag: "onCell", value: [key, value] }
+      }
     }
   }
-}
 
-export const onLoaded = (
-  value /*:{content:string, url:URL, isOwner:boolean }*/
-) => ({
+/**
+ * @param {Notebook.Doc} value
+ * @returns {Notebook.Message}
+ */
+export const onLoaded = (value) => ({
   tag: "onLoaded",
   value,
 })
 
-export const onLoadError = (value /*:Error*/) => ({
+/**
+ *
+ * @param {Error} value
+ * @returns {Notebook.Message}
+ */
+export const onLoadError = (value) => ({
   tag: "onLoadError",
   value,
 })
 
-export const execute = (key /*:ID*/) /*:Message*/ => ({
+/**
+ * @param {Notebook.ID} key
+ * @returns {Notebook.Message}
+ */
+export const execute = (key) => ({
   tag: "onCell",
   value: [key, Inbox.execute()],
 })

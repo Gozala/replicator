@@ -1,43 +1,41 @@
 import * as Observable from "../../modules/notebook-inspector/index.js"
-// import Style from "./InspectBlock.css.js"
-
-/**
- * @template T
- * @typedef {import('./Inspect').Inspectors<T>} Inspectors
- */
+import * as Inspect from "./Inspect.js"
 
 /**
  * @template T
  */
 export default class InpectBlock extends HTMLElement {
-  /*::
-  root:ShadowRoot
-  isConnected:boolean
-  select:HTMLSelectElement
-  state:?{value:a, inspectors:Inspectors<a>}
-  output:?HTMLElement
-  inspectors:Inspectors<a>
-  inspections:{[string]:{node:HTMLElement, inspector:Inspection<a>}}
-  options:{[string]:HTMLOptionElement}
-  activeInspector:?{node:HTMLElement, inspector:Inspection<a>}
-  handleEvent:Event => mixed
-  */
   constructor() {
     super()
     this.root = this.attachShadow({ mode: "open", delegatesFocus: true })
+    /** @type {null|{value:T, inspectors:Inspect.Inspectors<T>}} */
     this.state = null
+    /** @type {Inspect.Inspectors<T>} */
     this.inspectors = {}
+    /** @type {{[key: string]:{node:HTMLElement, inspector:Inspect.Inspection<T>}}} */
     this.inspections = {}
+    /** @type {Record<string, HTMLOptionElement>} */
     this.options = {}
+    /** @type {null|{node:HTMLElement, inspector:Inspect.Inspection<T>}} */
     this.activeInspector = null
+    /** @type {HTMLSelectElement} */
+    this.select
+    /** @type {null|HTMLElement} */
+    this.output = null
+
+    // /** @type {boolean} */
+    // this.isConnected
   }
   async connectedCallback() {
     const document = this.ownerDocument
     // const style = document.createElement("style")
     // style.textContent = Style
-    const style = document.createElement('link')
-    style.setAttribute('rel', 'stylesheet');
-    style.setAttribute('href', new URL("./InspectBlock.css", import.meta.url))
+    const style = document.createElement("link")
+    style.setAttribute("rel", "stylesheet")
+    style.setAttribute(
+      "href",
+      new URL("./InspectBlock.css", import.meta.url).toString()
+    )
 
     const select = document.createElement("select")
     this.select = select
@@ -83,20 +81,18 @@ export default class InpectBlock extends HTMLElement {
     }
   }
   /**
-   *
-   * @param {{value:T, inspectors:Inspectors<T>}} newState
+   * @param {{value:T, inspectors:Inspect.Inspectors<T>}} newState
    */
-  update(newState /*:{value:a, inspectors:Inspectors<a>}*/) {
+  update(newState) {
     const { select, state, inspectors, inspections, options } = this
     this.state = newState
     if (state == null) {
       const document = this.ownerDocument
-      const newInspector = newState.inspectors
-      for (const name of Object.keys(newInspector)) {
+      for (const [name, newInspector] of Object.entries(newState.inspectors)) {
         const option = select.appendChild(document.createElement("option"))
         option.value = name
         option.textContent = name
-        inspectors[name] = newInspector[name]
+        inspectors[name] = newInspector
         options[name] = option
       }
 
@@ -105,8 +101,7 @@ export default class InpectBlock extends HTMLElement {
       const { inspectors: oldInspectors, value: oldValue } = state
       const { inspectors: newInspectors, value: newValue } = newState
       if (oldInspectors != newInspectors) {
-        for (const name of Object.keys(newInspectors)) {
-          const newInspector = newInspectors[name]
+        for (const [name, newInspector] of Object.entries(newInspectors)) {
           const oldInspector = inspectors[name]
           if (oldInspector == null) {
             const option = select.appendChild(document.createElement("option"))
@@ -184,15 +179,16 @@ export default class InpectBlock extends HTMLElement {
   }
 }
 
-/*::
-
-*/
-
 const inspectors = Symbol.for("inspectors")
-const inspectorsFor = /*::<a>*/ (value /*:a*/) /*:Inspectors<a>*/ => {
-  const $inspectors /*:any*/ = inspectors
-  const $value /*:any*/ = value
-  const ownInspectors = $value && $value[$inspectors]
+
+/**
+ * @template T
+ * @param {T} value
+ * @returns {Inspect.Inspectors<T>}
+ */
+const inspectorsFor = (value) => {
+  /** @type {Inspect.Inspectors<T>|undefined} */
+  const ownInspectors = value && Object(value)[inspectors]
   if (ownInspectors && typeof ownInspectors === "object") {
     return { ...ownInspectors, ...baseInspectors }
   } else {
@@ -200,37 +196,57 @@ const inspectorsFor = /*::<a>*/ (value /*:a*/) /*:Inspectors<a>*/ => {
   }
 }
 
+/**
+ * @template T
+ */
 class ValueInspection extends Observable.Inspector {
-  static spawn(
-    value /*:mixed*/,
-    document /*:Document*/
-  ) /*:Inspection<mixed>*/ {
+  /**
+   * @template T
+   * @param {T} value
+   * @param {Document} document
+   * @returns {ValueInspection<T>}
+   */
+  static spawn(value, document) {
     const inspection = new ValueInspection(document.createElement("output"))
     inspection.send(value)
     return inspection
   }
-  /*::
-  node:Element
-  */
-  constructor(node /*:Element*/) {
+  /**
+   * @param {HTMLElement} node
+   */
+  constructor(node) {
     super(node)
     this.node = node
   }
-  send(value /*:mixed*/) /*:void*/ {
+
+  /**
+   * @param {T} value
+   */
+  send(value) {
     if (value instanceof Error) {
       this.rejected(value)
     } else {
       this.fulfilled(value)
     }
   }
-  render() /*:Element*/ {
+
+  /**
+   * @returns {HTMLElement}
+   */
+  render() {
     return this.node
   }
 }
 
-/** @type {Inspectors<any>} */
+/** @type {Inspect.Inspectors<any>} */
 const baseInspectors = { Inspector: ValueInspection }
 
+/**
+ *
+ * @param {string} formattedValue
+ * @param {string} type
+ * @returns {HTMLElement}
+ */
 const plain = (formattedValue, type) => {
   const code = document.createElement("code")
   code.className = `${type}`
