@@ -183,10 +183,10 @@ export const view = (state /*:Model*/) =>
   )
 
 /**
- * @param {Notebook.Model} state
+ * @param {Notebook.Model} _state
  * @returns {Notebook.View}
  */
-const viewHeader = (state) =>
+const viewHeader = (_state) =>
   header(
     [
       className(

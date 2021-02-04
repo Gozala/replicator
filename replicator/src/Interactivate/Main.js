@@ -20,8 +20,8 @@ export const init = ({ state, url }) => {
     return [state, nofx]
   } else {
     // const path = url.pathname.substr(1)
-    // const notebookURL = path === "" ? null : new URL(`//${path}`, url)
-    const [notebook, fx] = Notebook.open()
+    // const _notebookURL = path === "" ? null : new URL(`//${path}`, url)
+    const [notebook, fx] = Notebook.open(void url)
     return [Data.init(notebook), fx.map(Inbox.notebook)]
   }
 }

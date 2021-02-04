@@ -1,4 +1,4 @@
-import * as Observable from "../../modules/notebook-inspector/index.js"
+import { Inspector } from "../../modules/observable.js"
 import * as Inspect from "./Inspect.js"
 
 /**
@@ -198,8 +198,9 @@ const inspectorsFor = (value) => {
 
 /**
  * @template T
+ * @extends {Inspector<T>}
  */
-class ValueInspection extends Observable.Inspector {
+class ValueInspection extends Inspector {
   /**
    * @template T
    * @param {T} value
@@ -247,7 +248,7 @@ const baseInspectors = { Inspector: ValueInspection }
  * @param {string} type
  * @returns {HTMLElement}
  */
-const plain = (formattedValue, type) => {
+export const plain = (formattedValue, type) => {
   const code = document.createElement("code")
   code.className = `${type}`
   code.textContent = formattedValue

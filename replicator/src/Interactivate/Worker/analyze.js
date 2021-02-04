@@ -1,4 +1,4 @@
-// @noflow
+// @ts-nocheck
 
 const global = self
 
@@ -13,6 +13,6 @@ self.onmessage = (message /*:MessageEvent*/) => {
     id: message.data.id,
     labels: Object.keys(labels),
     bindings: Object.keys(bindings),
-    globals: Object.keys(globals)
+    globals: Object.keys(globals),
   })
 }

@@ -1,6 +1,6 @@
 /**
+ * @typedef {"g"|"i"|"m"|"s"|"u"|"y"} Flag
  * @typedef {string | number | RegExp | Re} Param
- * @typdef {string[]} Literals
  * @typedef {(match:{match:string, captured:string[], offset:number, source:string}) => string} Replacer
  */
 
@@ -15,7 +15,13 @@ class Re {
   +sticky:boolean
   +unicode:boolean
   */
-  static new(raw /*:string[]*/, params /*:Param[]*/, flags /*:string*/) {
+
+  /**
+   * @param {TemplateStringsArray} raw
+   * @param {Param[]} params
+   * @returns {Re}
+   */
+  static new(raw, params) {
     let source = ""
     let offset = 0
     let count = raw.length
@@ -23,7 +29,7 @@ class Re {
       source += raw[offset]
       offset += 1
       if (params.length > 0) {
-        const param = params.shift()
+        const param = /** @type {Param} */ (params.shift())
         switch (typeof param) {
           case "string": {
             source += param
@@ -42,7 +48,12 @@ class Re {
     }
     return new Re(source)
   }
-  constructor(source /*:string*/, flags /*:string*/ = "") {
+
+  /**
+   * @param {string} source
+   * @param {string} [flags]
+   */
+  constructor(source, flags = "") {
     const regExp = new RegExp(source, flags)
     this.regExp = regExp
     this.source = source
@@ -54,22 +65,44 @@ class Re {
     this.sticky = sticky
     this.unicode = unicode
   }
+
+  /**
+   * @param {string} text
+   * @returns {boolean}
+   */
   test(text /*:string*/) {
     const { regExp } = this
     regExp.lastIndex = 0
     return regExp.test(text)
   }
-  split(text /*:string*/) /*:string[]*/ {
+
+  /**
+   * @param {string} text
+   * @returns {string[]}
+   */
+  split(text) {
     const { regExp } = this
     regExp.lastIndex = 0
     return text.split(regExp)
   }
-  replace(source /*:string*/, replacement /*:string*/) /*:string*/ {
+
+  /**
+   * @param {string} source
+   * @param {string} replacement
+   * @returns {string}
+   */
+  replace(source, replacement) {
     const { regExp } = this
     regExp.lastIndex = 0
     return source.replace(regExp, replacement)
   }
-  replaceWith(source /*:string*/, replacer /*:Replacer*/) /*:string*/ {
+
+  /**
+   * @param {string} source
+   * @param {Replacer} replacer
+   * @returns {string}
+   */
+  replaceWith(source, replacer) {
     const { regExp } = this
     regExp.lastIndex = 0
     return source.replace(regExp, (match, ...args) => {
@@ -78,7 +111,14 @@ class Re {
       return replacer({ match, captured: args, source, offset })
     })
   }
-  search(text /*:string*/, offset /*:number*/ = 0) /*:number*/ {
+
+  /**
+   *
+   * @param {string} text
+   * @param {number} [offset=0]
+   * @returns {number}
+   */
+  search(text, offset = 0) {
     const { regExp } = this
     regExp.lastIndex = offset
     return text.search(regExp)
@@ -88,7 +128,13 @@ class Re {
   }
 }
 
-const compile = ({ raw } /*:any*/, params /*:Param[]*/) => {
+/**
+ *
+ * @param {TemplateStringsArray} literals
+ * @param {Param[]} params
+ * @returns
+ */
+const compile = ({ raw }, params) => {
   let source = ""
   let offset = 0
   let count = raw.length
@@ -96,7 +142,7 @@ const compile = ({ raw } /*:any*/, params /*:Param[]*/) => {
     source += raw[offset]
     offset += 1
     if (params.length > 0) {
-      const param = params.shift()
+      const param = /** @type {Param} */ (params.shift())
       switch (typeof param) {
         case "string": {
           source += param
@@ -116,9 +162,22 @@ const compile = ({ raw } /*:any*/, params /*:Param[]*/) => {
   return source
 }
 
-export const re = (literals /*:Literals*/, ...params /*:Param[]*/) =>
-  new Re(compile(literals, params))
+/**
+ *
+ * @param {TemplateStringsArray} literals
+ * @param  {Param[]} params
+ * @returns
+ */
+export const re = (literals, ...params) => new Re(compile(literals, params))
 
-export const regex = (literals /*:Literals*/, ...params /*:Param[]*/) => (
-  flags /*:string[]*/
-) => new Re(compile(literals, params), flags.join(""))
+/**
+ *
+ * @param {TemplateStringsArray} literals
+ * @param  {Param[]} params
+ * @returns
+ */
+export const regex = (literals, ...params) =>
+  /**
+   * @param {Flag[]} flags
+   */
+  (flags /*:string[]*/) => new Re(compile(literals, params), flags.join(""))

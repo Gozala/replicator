@@ -1,15 +1,9 @@
-// @flow strict
+// @ts-nocheck
 
 import { regex, re } from "../../modules/Data/RegExp.js"
 import CodeMirror from "../../modules/codemirror.js"
-import JSMODE from "../../modules/codemirror/mode/javascript/javascript.js"
-import matchBrackets from "../../modules/codemirror/addon/edit/matchbrackets.js"
-// import * as interactivate from "./codemirror-addon/interactivate.js"
 import { idle } from "../Effect/scheduler.js"
 import { unreachable } from "../../modules/reflex/src/Basics.js"
-JSMODE(CodeMirror)
-matchBrackets(CodeMirror)
-// interactivate.plugin(CodeMirror)
 
 /*::
 import type { Editor } from "../codemirror.js"

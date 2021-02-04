@@ -60,5 +60,17 @@
     /* Advanced Options */
     "skipLibCheck": true, /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
-  }
+  },
+  "exclude": [
+    "./modules/codemirror/**/*.js",
+    "./modules/notebook-inspector/**/*.js",
+    "./modules/ipfs-core/**/*.js",
+    "./src/Interactivate/Worker/*.js",
+    "./modules/codemirror.js",
+    "./modules/observable.js"
+  ],
+  "include": [
+    "./src",
+    "./modules"
+  ]
 }
