@@ -1,7 +1,8 @@
-import { nofx, fx } from "../../modules/reflex/src/Effect.js"
+import { nofx, fx, batch } from "../../modules/reflex/src/Effect.js"
 import { text, doc, body, button } from "../../modules/reflex/src/Element.js"
 import { on, className } from "../../modules/reflex/src/Attribute.js"
 import { unreachable } from "../../modules/reflex/src/Basics.js"
+import * as IPFS from "../Service/IPFS.js"
 
 import * as Main from "./Main/Main.js"
 import * as Data from "./Main/Data.js"
@@ -19,10 +20,12 @@ export const init = ({ state, url }) => {
   if (state) {
     return [state, nofx]
   } else {
-    // const path = url.pathname.substr(1)
-    // const _notebookURL = path === "" ? null : new URL(`//${path}`, url)
-    const [notebook, fx] = Notebook.open(void url)
-    return [Data.init(notebook), fx.map(Inbox.notebook)]
+    const [notebook, open] = Notebook.open(url)
+
+    return [
+      Data.init(notebook),
+      batch(fx(IPFS.start()), open.map(Inbox.notebook)),
+    ]
   }
 }
 

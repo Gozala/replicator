@@ -1,10 +1,12 @@
 /**
  * @param {URL} url
  */
-export const load = (url /*:URL*/) =>
+export const load = (url) =>
   /**
    * @returns {Promise<import('./Notebook').Doc>}
    */
   async () => {
-    return { url, content: 'show: "Hello"\n', isOwner: true }
+    const response = await fetch(url.toString())
+    const content = await response.text()
+    return { url, content, isOwner: true }
   }

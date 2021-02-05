@@ -252,3 +252,45 @@ export const textInput = (state) => {
  */
 export const idByOffset = (offset, id, state) =>
   SelectionMap.keyByOffset(offset, id, state.cells)
+
+/**
+ * Attempts to figures out CID from the the given URL. Returns either CID
+ * (in string representation) or null.
+ *
+ * @expample
+ * ```js
+ * deriveCID(new URL(http://bafybeigizayotjo4whdurcq6ge7nrgfyxox7ji7oviesmnvgrnxn3nakni.ipfs.localhost:5000/))
+ * //> "bafybeigizayotjo4whdurcq6ge7nrgfyxox7ji7oviesmnvgrnxn3nakni"
+ * deriveCID(new URL('https://ipfs.io/ipfs/QmbrRJJNKmPDUAZ8CGwn1WNx2C7xP4J284VWoAUDaCiLaD'))
+ * //> "QmbrRJJNKmPDUAZ8CGwn1WNx2C7xP4J284VWoAUDaCiLaD"
+ * ```
+ * @param {URL} url
+ * @returns {string|null}
+ */
+export const deriveCID = (url) =>
+  deriveCIDFromHostname(url.hostname) || deriveCIDFromPath(url.pathname)
+
+/**
+ * @param {string} hostname
+ * @returns {string|null}
+ */
+const deriveCIDFromHostname = (hostname) => {
+  const index = hostname.indexOf(".ipfs.")
+  if (index > 0) {
+    return hostname.slice(0, index)
+  }
+  return null
+}
+
+/**
+ * @param {string} path
+ * @returns {string|null}
+ */
+const deriveCIDFromPath = (path) => {
+  if (path.startsWith("/ipfs/")) {
+    const start = "/ipfs/".length
+    const end = path.indexOf("/", start)
+    return path.slice(start, end > 0 ? end : path.length)
+  }
+  return null
+}

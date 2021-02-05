@@ -30,16 +30,19 @@ export const init = () => {
  * @param {URL} url
  * @returns {Notebook.State}
  */
-export const load = (url) => [
-  Data.load(url),
-  fx(Effect.load(url), Inbox.onLoaded, Inbox.onLoadError),
-]
+export const load = (url) => {
+  return [
+    Data.load(url),
+    fx(Effect.load(url), Inbox.onLoaded, Inbox.onLoadError),
+  ]
+}
 
 /**
  *
- * @param {URL} [url]
+ * @param {URL} _url
  */
-export const open = (url /*:?URL*/) => (url ? load(url) : init())
+export const open = (_url) =>
+  load(new URL("../../data/code.js", import.meta.url))
 
 /**
  *
