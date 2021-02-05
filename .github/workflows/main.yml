@@ -37,23 +37,24 @@ jobs:
       - name: Build dependencies
         run: yarn prepare
 
-  # test:
-  #   name: Test
-  #   runs-on: ${{ matrix.os }}
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
 
-  #   strategy:
-  #     matrix:
-  #       os:
-  #         - ubuntu-latest
-  #         - macos-latest
-  #         - windows-latest
-  #       node-version:
-  #         - 14.x
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          # - macos-latest
+          # - windows-latest
+        node-version:
+          - 14.x
 
-  #   needs: install
-  #   steps:
-  #     - name: Test
-  #       run: npm run test --if-present
+    needs: install
+    steps:
+      - name: Test
+        # Yarn has no --if-present
+        run: npm run test --if-present
 
   type-check:
     name: Type check
