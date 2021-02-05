@@ -147,7 +147,7 @@ jobs:
       # see: https://github.com/ipfs-shipyard/ipfs-github-action
       - name: Publish to IPFS
         id: ipfs
-        uses: ipfs-shipyard/ipfs-github-action@v2
+        uses: ipfs-shipyard/ipfs-github-action@v2.0.0
         with:
           path_to_add: replicator
           cluster_host: /dnsaddr/cluster.ipfs.io
