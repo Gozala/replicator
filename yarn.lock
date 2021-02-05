@@ -3509,7 +3509,7 @@ receptacle@^1.3.2:
 
 "reflex@git://github.com/gozala/reflex#ts":
   version "2.0.0"
-  resolved "git://github.com/gozala/reflex#c44d075d479a31e32ee8d85a1d2a28e07147135d"
+  resolved "git://github.com/gozala/reflex#fcdc8bf03550da822ac13cb56ec00f1bab3a849d"
 
 relative-url@^1.0.2:
   version "1.0.2"

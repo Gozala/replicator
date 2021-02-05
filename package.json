@@ -13,7 +13,7 @@
     "install:ipfs": "esbuild node_modules/ipfs-core --bundle --format=esm --sourcemap --main-fields=browser,module,main --inject:./src/node-globals.js --define:process.env.NODE_ENV='\"production\"' --splitting --outdir=./replicator/modules/ipfs-core",
     "install:notebook-inspector": "esbuild node_modules/@observablehq/notebook-inspector/src/* --outdir=./replicator/modules/notebook-inspector",
     "install:reflex": "mkdir -p ./replicator/modules/reflex/src/ && cp node_modules/reflex/src/* ./replicator/modules/reflex/src/",
-    "install:codemirror": "cp node_modules/@types/codemirror/index.d.ts replicator/modules/codemirror.ts"
+    "install:codemirror": "cp node_modules/@types/codemirror/index.d.ts replicator/modules/codemirror.d.ts"
   },
   "dependencies": {
     "@observablehq/notebook-inspector": "git://github.com/gozala/notebook-inspector#master",
