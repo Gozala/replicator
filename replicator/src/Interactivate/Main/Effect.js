@@ -20,25 +20,34 @@ export const save = (url, content, _options = {}) => async () => {
     throw Error(`Unable to figure out CID from ${url}`)
   }
 
-  const data = await ipfs.add(new File([content], "code.js"), {
+  const file = { path: "code.js", content: new Blob([content]) }
+  const data = await ipfs.add(file, {
     wrapWithDirectory: true,
   })
 
   console.log({ data })
 
-  const original = await ipfs.dag.get(cid)
+  const { value: original } = await ipfs.dag.get(cid)
   console.log({ original })
 
-  const fork = await ipfs.dag.put({ ...original, data })
-  console.log({ fork })
+  // @ts-ignore
+  original.rmLink("data")
+  // @ts-ignore
+  original.addLink({
+    Name: "data",
+    Hash: data.cid,
+    Tsize: data.size,
+  })
 
-  const forkURL = new URL(`/ipfs/${fork}`, url)
+  const fork = await ipfs.block.put(original.serialize())
+
+  const forkURL = new URL(`/ipfs/${fork.cid}`, url)
 
   try {
     history.pushState(null, "", forkURL.toString())
-  } catch (e) {}
-
-  return fork
+  } catch (e) {
+    window.open(forkURL.toString())
+  }
 }
 
 /**
