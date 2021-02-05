@@ -64,7 +64,7 @@
   "exclude": [
     "./modules/codemirror/**/*.js",
     "./modules/notebook-inspector/**/*.js",
-    "./modules/ipfs-core/**/*.js",
+    "./modules/ipfs-core/index.js",
     "./src/Interactivate/Worker/*.js",
     "./modules/codemirror.js",
     "./modules/observable.js"

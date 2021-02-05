@@ -1,14 +1,16 @@
 import { navigate, load } from "../../Effect/Navigation.js"
 import * as IPFS from "../../Service/IPFS.js"
 import { deriveCID } from "../Notebook/Data.js"
+
 /**
  * @param {URL} url
  * @param {string} content
- * @param {Object} [options]
- * @param {number} [options.timeout]
+ * @param {Object} [_options]
+ * @param {number} [_options.timeout]
  */
-export const save = (url, content, options = {}) => async () => {
-  const cid = deriveCID(url)
+export const save = (url, content, _options = {}) => async () => {
+  const result = deriveCID(url)
+  const cid = result ? new IPFS.CID(result) : null
   console.log({ cid })
 
   const ipfs = await IPFS.use()
