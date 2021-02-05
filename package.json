@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Experimental collborative runtime",
   "repository": "https://github.com/gozala/replicator",
-  "author": "Irakli Gozalishvili <contact@gozala.io>",
+  "author": "Irakli Gozalishvili <dev@gozala.io>",
   "license": "MIT",
   "scripts": {
     "test": "echo '🚧 TODO: Setup test infrastructure! 🚧'",
