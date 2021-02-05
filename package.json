@@ -6,6 +6,7 @@
   "author": "Irakli Gozalishvili <contact@gozala.io>",
   "license": "MIT",
   "scripts": {
+    "test": "echo '🚧 TODO: Setup test infrastructure! 🚧'",
     "type-check": "tsc --noEmit --project ./replicator",
     "release": "ipfs add --quieter --recursive ./replicator",
     "prepare": "npm run install:ipfs && npm run install:notebook-inspector && npm run install:reflex && npm run install:codemirror",

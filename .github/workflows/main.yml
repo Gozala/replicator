@@ -53,8 +53,7 @@ jobs:
     needs: install
     steps:
       - name: Test
-        # Yarn has no --if-present
-        run: npm run test --if-present
+        run: yarn test
 
   type-check:
     name: Type check
@@ -62,12 +61,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: ["replicator"]
+        os:
+          - ubuntu-latest
+        project:
+          - "replicator"
+
     steps:
-      - name: Type check ${{ matrix.target }}
+      - name: Type check ${{ matrix.project }}
         uses: gozala/typescript-error-reporter-action@v1.0.5
         with:
-          project: ${{ matrix.target }}
+          project: ${{ matrix.project }}/tsconfig.json
 
   release:
     name: Release
