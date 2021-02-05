@@ -27,7 +27,7 @@ export default class InpectBlock extends HTMLElement {
     // this.isConnected
   }
   async connectedCallback() {
-    const document = this.ownerDocument
+    const document = /** @type {Document} */ (this.ownerDocument)
     // const style = document.createElement("style")
     // style.textContent = Style
     const style = document.createElement("link")
