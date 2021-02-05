@@ -25,9 +25,13 @@ export default class InpectBlock extends HTMLElement {
 
     // /** @type {boolean} */
     // this.isConnected
+
+    // For some reason otherwise on CI this has type `Document | null`.
+    /** @type {Document} */
+    this.ownerDocument
   }
   async connectedCallback() {
-    const document = /** @type {Document} */ (this.ownerDocument)
+    const document = this.ownerDocument
     // const style = document.createElement("style")
     // style.textContent = Style
     const style = document.createElement("link")
