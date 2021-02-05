@@ -1,3 +1,4 @@
+name: Check, Test, Release
 on:
   push:
     branches: [default]
