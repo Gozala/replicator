@@ -50,10 +50,38 @@ export const updateOutput = (output, state) => ({
 export const input = ({ input }) => input
 
 /**
+ * Tokenizes `input` code by splitting it into "cell" chunks. Labeled line is
+ * considered to be an end of the cell.
+ * @example
+ *
+ * ```js
+ * tokenize(`const x = 1
+ * show: x
+ * const y = 2
+ * const z = x * y
+ * show: z * z
+ * `)
+ *
+ * // => [
+ * `const x = 1
+ * show: x
+ * `,
+ * `const y = 1
+ * const z = x * y
+ * show: z * z
+ * `
+ * ]
+ * ```
+ *
+ * Note this is a very primitive approach as labeled expressions spanning
+ * multiple lines would get split across cells, instead of splitting a cell
+ * at the end of expression. Ideally we would access tokens from codemirror
+ * instead, or do our own parse, but for now this will do.
+ *
  * @param {string} input
  * @returns {string[]}
  */
-export const tokenize = (input /*:string*/) /*:string[]*/ => {
+export const tokenize = (input) => {
   const tokens = []
   let match = null
   let offset = 0
