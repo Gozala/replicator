@@ -1,4 +1,4 @@
-name: Check, Test, Release
+name: 🔬
 on:
   push:
     branches: [default]
