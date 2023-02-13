@@ -29,13 +29,13 @@ It is assumed that you have `ipfs` in your path and initialized repo, in which
 case running `yarn release` will produce output like:
 
 ```
-$ ipfs add --quieter --recursive ./replicator
-QmbrRJJNKmPDUAZ8CGwn1WNx2C7xP4J284VWoAUDaCiLaD
+$ ipfs add --cid-version=1 --quieter --recursive ./replicator
+bafybeidrwvc3jhfccu4qup6a6a7hye446tl3csx3wyt2azzmmmmagexti4
 ```
 
 That is it you can take that CID and access deployed version either over local
-IPFS gateway like http://localhost:8081/ipfs/QmbrRJJNKmPDUAZ8CGwn1WNx2C7xP4J284VWoAUDaCiLaD
-or one of the public gateways like https://dweb.link/ipfs/QmbrRJJNKmPDUAZ8CGwn1WNx2C7xP4J284VWoAUDaCiLaD
+IPFS gateway like <http://localhost:8081/ipfs/bafybeidrwvc3jhfccu4qup6a6a7hye446tl3csx3wyt2azzmmmmagexti4>
+or one of the public gateways like https://dweb.link/ipfs/bafybeidrwvc3jhfccu4qup6a6a7hye446tl3csx3wyt2azzmmmmagexti4
 
 ### Known Issues
 
