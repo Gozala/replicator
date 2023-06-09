@@ -4,6 +4,7 @@ on:
     branches: [default]
   pull_request:
     branches: [default]
+  workflow_dispatch:
 
 jobs:
   install:
